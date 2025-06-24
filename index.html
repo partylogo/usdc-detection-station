@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USDC 檢測站 | USDC Detection Station</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="https://pplx-res.cloudinary.com/image/upload/v1749270038/pplx_project_search_images/6bfa0e3df3e1efa415f345e84b171e74deac8b5d.jpg" alt="USDC Logo" class="usdc-logo">
+                    <div class="title-section">
+                        <h1>USDC 檢測站</h1>
+                        <p class="subtitle">USDC Detection Station</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="timestamp">
+                        <span class="timestamp-label">最後更新 | Last Updated:</span>
+                        <span class="timestamp-value" id="lastUpdated">2025-06-24 12:56 PM</span>
+                    </div>
+                    <button class="btn btn--primary update-btn" id="updateBtn">
+                        <span class="update-text">更新數據</span>
+                        <span class="update-text-en">Update Data</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Dashboard -->
+        <main class="dashboard">
+            <!-- Current Supply Section -->
+            <section class="supply-overview">
+                <div class="card supply-card">
+                    <div class="card__body">
+                        <div class="supply-header">
+                            <h2>目前 USDC 總發行量</h2>
+                            <p class="supply-subtitle">Current USDC Total Supply</p>
+                        </div>
+                        <div class="supply-main">
+                            <div class="supply-amount">
+                                <span class="currency-symbol">$</span>
+                                <span class="amount-value" id="totalSupply">61,690</span>
+                                <span class="amount-unit">百萬 | Million</span>
+                            </div>
+                            <div class="supply-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Q1 2025 增長 | Q1 2025 Growth</span>
+                                    <span class="stat-value positive">+$16,119M (+36.8%)</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">市值 | Market Cap</span>
+                                    <span class="stat-value" id="marketCap">$61,690M</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <div class="charts-grid">
+                    <!-- Monthly Chart -->
+                    <div class="card chart-card">
+                        <div class="card__body">
+                            <div class="chart-header">
+                                <h3>每月供應量趨勢</h3>
+                                <p class="chart-subtitle">Monthly Supply Trend</p>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="monthlyChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Yearly Chart -->
+                    <div class="card chart-card">
+                        <div class="card__body">
+                            <div class="chart-header">
+                                <h3>每年供應量趨勢</h3>
+                                <p class="chart-subtitle">Yearly Supply Trend</p>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="yearlyChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chain Distribution Section -->
+            <section class="distribution-section">
+                <div class="distribution-grid">
+                    <!-- Chart -->
+                    <div class="card distribution-chart-card">
+                        <div class="card__body">
+                            <div class="chart-header">
+                                <h3>USDC 在不同鏈的分布</h3>
+                                <p class="chart-subtitle">USDC Distribution Across Chains</p>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chainChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chain Stats Table -->
+                    <div class="card chain-stats-card">
+                        <div class="card__body">
+                            <div class="chart-header">
+                                <h3>鏈分布統計</h3>
+                                <p class="chart-subtitle">Chain Distribution Statistics</p>
+                            </div>
+                            <div class="chain-stats-table" id="chainStatsTable">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p class="footer-text">
+                    數據來源 | Data Sources: Circle, Etherscan, Various Chain Explorers
+                </p>
+                <p class="footer-timestamp">
+                    系統時間 | System Time: <span id="systemTime"></span>
+                </p>
+            </div>
+        </footer>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">
+                <p>更新數據中...</p>
+                <p>Updating Data...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
