@@ -9,10 +9,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Global chart instances
+// Global variables
 let monthlyChart;
 let yearlyChart;
 let chainChart;
+let isInitialLoad = true; // Track if this is the first load
 
 // Chart colors
 const chartColors = ['#1FB8CD', '#FFC185', '#B4413C', '#ECEBD5', '#5D878F', '#DB4545', '#D2BA4C', '#964325', '#944454', '#13343B'];
@@ -36,9 +37,12 @@ const apiConfig = {
     updateInterval: 300000, // 5 minutes
     retryAttempts: 3,
     cacheExpiry: 600000,    // 10 minutes
-    timeout: 10000,         // 10 seconds
-    maxFailures: 5,         // Max consecutive failures before switching to offline mode
-    healthCheckInterval: 60000 // 1 minute health check
+    timeout: 5000,          // Reduced to 5 seconds for faster fallback
+    maxFailures: 2,         // Reduced for quicker offline mode switch
+    healthCheckInterval: 60000, // 1 minute health check
+    // Add CORS handling
+    corsProxy: '', // Can be enabled if needed
+    useProxy: false
 };
 
 // Error tracking and recovery
@@ -172,86 +176,80 @@ async function initializeApp() {
         // Set last updated timestamp
         document.getElementById('lastUpdated').textContent = formatTimestamp(new Date());
 
-        // Try to load real data first
-        let currentData = await loadRealTimeData();
-        if (!currentData) {
-            console.log('Using fallback static data');
-            currentData = enhanceStaticData(appData);
-        }
-
-        // Initialize the dashboard data
-        updateDashboardData(currentData);
+        // Always start with static data for immediate UI rendering
+        console.log('Loading static data for immediate display...');
+        let currentData = enhanceStaticData(appData);
         
-        // Update growth metrics
+        // Initialize the dashboard data immediately
+        updateDashboardData(currentData);
         updateGrowthMetrics(currentData);
-
-        // Create charts
         createMonthlyChart(currentData.monthly);
         createYearlyChart(currentData.yearly);
         createChainChart(currentData.chains);
-
-        // Populate chain distribution table
         populateChainTable(currentData.chains);
+
+        // Try to load real data asynchronously without blocking UI
+        setTimeout(async () => {
+            try {
+                console.log('Attempting to load real-time data...');
+                const realTimeData = await loadRealTimeData();
+                if (realTimeData) {
+                    console.log('Real-time data loaded successfully');
+                    updateDashboardData(realTimeData);
+                    updateGrowthMetrics(realTimeData);
+                    // Update charts with new data
+                    if (monthlyChart) monthlyChart.destroy();
+                    if (yearlyChart) yearlyChart.destroy();
+                    if (chainChart) chainChart.destroy();
+                    createMonthlyChart(realTimeData.monthly);
+                    createYearlyChart(realTimeData.yearly);
+                    createChainChart(realTimeData.chains);
+                    populateChainTable(realTimeData.chains);
+                    
+                    // Only show success notification if not initial load
+                    if (!isInitialLoad) {
+                        showNotification('數據已更新 | Data updated successfully', 'success');
+                    }
+                } else {
+                    console.log('Failed to load real-time data, using static data');
+                    if (!isInitialLoad) {
+                        showNotification('使用離線數據 | Using offline data', 'warning');
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to load real-time data:', error);
+                if (!isInitialLoad) {
+                    showNotification('API 暫時無法使用，顯示離線數據 | API temporarily unavailable, showing offline data', 'warning');
+                }
+            } finally {
+                // Mark initial load as complete
+                isInitialLoad = false;
+            }
+        }, 100); // Small delay to ensure UI renders first
 
         // Set up automatic updates
         startAutoUpdate();
         
         // Start health monitoring
         startHealthMonitoring();
-        
+
         console.log('USDC Detection Station initialized successfully');
-        
-        // Show initialization status
-        if (currentData.source) {
-            showNotification('系統初始化完成，實時數據已載入', 'success');
-        } else {
-            showAdvancedNotification(
-                'API 暫時無法連接，使用離線模式', 
-                'warning', 
-                { 
-                    showRetry: true, 
-                    retryCallback: updateData,
-                    duration: 8000
-                }
-            );
-        }
-        
+
     } catch (error) {
         console.error('Failed to initialize app:', error);
-        
-        // Record the initialization failure
-        errorTracker.recordFailure(error);
-        
+        // Even if initialization fails, try to show something
         try {
-            // Emergency fallback to basic static data
-            console.log('Emergency fallback to static data...');
             const fallbackData = enhanceStaticData(appData);
-            
             updateDashboardData(fallbackData);
             updateGrowthMetrics(fallbackData);
             createMonthlyChart(fallbackData.monthly);
             createYearlyChart(fallbackData.yearly);
             createChainChart(fallbackData.chains);
             populateChainTable(fallbackData.chains);
-            updateSystemTime();
-            updateConnectionStatus();
-            
-            // Still start monitoring for recovery
-            startHealthMonitoring();
-            
-            showAdvancedNotification(
-                '初始化失敗，運行在緊急模式', 
-                'error', 
-                { 
-                    showRetry: true, 
-                    retryCallback: updateData,
-                    persistent: true
-                }
-            );
-            
-        } catch (emergencyError) {
-            console.error('Emergency fallback failed:', emergencyError);
-            showNotification('嚴重錯誤：系統無法啟動', 'error');
+            showNotification('應用初始化失敗，顯示備用數據 | App initialization failed, showing backup data', 'error');
+        } catch (fallbackError) {
+            console.error('Even fallback initialization failed:', fallbackError);
+            showNotification('應用初始化失敗 | Application initialization failed', 'error');
         }
     }
 }
@@ -328,18 +326,22 @@ async function fetchUSDCData() {
     throw new Error(`All API sources failed. Last error: ${lastError?.message}`);
 }
 
-// Fetch from a specific source with timeout and retry
+// Fetch data from a specific source with retry logic
 async function fetchFromSource(url, sourceName, retryCount = 0) {
+    console.log(`Attempting to fetch from ${sourceName} (attempt ${retryCount + 1})`);
+    
     try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), apiConfig.timeout);
         
         const response = await fetch(url, {
-            signal: controller.signal,
+            method: 'GET',
             headers: {
                 'Accept': 'application/json',
-                'User-Agent': 'USDC-Detection-Station/1.0'
-            }
+                'Content-Type': 'application/json',
+            },
+            mode: 'cors', // Explicitly set CORS mode
+            signal: controller.signal
         });
         
         clearTimeout(timeoutId);
@@ -349,15 +351,29 @@ async function fetchFromSource(url, sourceName, retryCount = 0) {
         }
         
         const data = await response.json();
+        console.log(`Successfully fetched data from ${sourceName}`);
         return data;
         
     } catch (error) {
-        if (retryCount < apiConfig.retryAttempts - 1) {
-            console.log(`Retrying ${sourceName} (attempt ${retryCount + 2}/${apiConfig.retryAttempts})`);
-            await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+        console.warn(`Failed to fetch from ${sourceName}:`, error.message);
+        
+        // Handle specific error types
+        if (error.name === 'AbortError') {
+            console.warn(`Request to ${sourceName} timed out after ${apiConfig.timeout}ms`);
+        } else if (error.message.includes('CORS')) {
+            console.warn(`CORS error with ${sourceName} - this is common in production environments`);
+        } else if (error.message.includes('Failed to fetch')) {
+            console.warn(`Network error with ${sourceName} - possibly blocked or unavailable`);
+        }
+        
+        // Retry logic
+        if (retryCount < apiConfig.retryAttempts) {
+            console.log(`Retrying ${sourceName} in ${(retryCount + 1) * 1000}ms...`);
+            await new Promise(resolve => setTimeout(resolve, (retryCount + 1) * 1000));
             return fetchFromSource(url, sourceName, retryCount + 1);
         }
         
+        // All retries exhausted
         throw error;
     }
 }
@@ -540,8 +556,6 @@ function calculateGrowthRate(data) {
     }
     return result;
 }
-
-
 
 // Format timestamp
 function formatTimestamp(date) {
@@ -1022,12 +1036,17 @@ async function updateData() {
         // Update last updated timestamp
         document.getElementById('lastUpdated').textContent = formatTimestamp(new Date());
         
-        // Show appropriate success message
-        if (updateSuccessful) {
-            showNotification(`數據更新成功 (${dataSource})`, 'success');
-        } else if (fallbackUsed) {
-            showNotification(`使用${dataSource}更新`, 'info');
+        // Show appropriate success message (but not on initial load)
+        if (!isInitialLoad) {
+            if (updateSuccessful) {
+                showNotification(`數據更新成功 (${dataSource})`, 'success');
+            } else if (fallbackUsed) {
+                showNotification(`使用${dataSource}更新`, 'info');
+            }
         }
+        
+        // Mark initial load as complete after first update
+        isInitialLoad = false;
         
     } catch (error) {
         console.error('Critical error during data update:', error);
@@ -1047,11 +1066,16 @@ async function updateData() {
             // Update timestamp even for emergency fallback
             document.getElementById('lastUpdated').textContent = formatTimestamp(new Date());
             
-            showNotification('系統錯誤，使用緊急備用數據', 'error');
+            // Only show error notification if not initial load
+            if (!isInitialLoad) {
+                showNotification('系統錯誤，使用緊急備用數據', 'error');
+            }
             
         } catch (emergencyError) {
             console.error('Emergency fallback also failed:', emergencyError);
-            showNotification('嚴重錯誤：無法載入任何數據', 'error');
+            if (!isInitialLoad) {
+                showNotification('嚴重錯誤：無法載入任何數據', 'error');
+            }
         }
         
     } finally {
