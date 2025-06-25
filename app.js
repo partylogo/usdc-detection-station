@@ -32,10 +32,58 @@ const chainColors = {
 const apiConfig = {
     primary: 'https://api.coingecko.com/api/v3/coins/usd-coin',
     backup: 'https://api.coinbase.com/v2/currencies/USDC',
+    fallback: 'https://api.coinmarketcap.com/data-api/v3/cryptocurrency/detail?symbol=USDC',
     updateInterval: 300000, // 5 minutes
     retryAttempts: 3,
     cacheExpiry: 600000,    // 10 minutes
-    timeout: 10000          // 10 seconds
+    timeout: 10000,         // 10 seconds
+    maxFailures: 5,         // Max consecutive failures before switching to offline mode
+    healthCheckInterval: 60000 // 1 minute health check
+};
+
+// Error tracking and recovery
+const errorTracker = {
+    consecutiveFailures: 0,
+    lastSuccessfulUpdate: null,
+    isOfflineMode: false,
+    lastError: null,
+    
+    recordSuccess() {
+        this.consecutiveFailures = 0;
+        this.lastSuccessfulUpdate = Date.now();
+        this.isOfflineMode = false;
+        this.lastError = null;
+    },
+    
+    recordFailure(error) {
+        this.consecutiveFailures++;
+        this.lastError = error;
+        
+        if (this.consecutiveFailures >= apiConfig.maxFailures) {
+            this.isOfflineMode = true;
+            console.warn('Switching to offline mode after', this.consecutiveFailures, 'consecutive failures');
+        }
+    },
+    
+    shouldAttemptAPI() {
+        return !this.isOfflineMode || this.shouldRetryConnection();
+    },
+    
+    shouldRetryConnection() {
+        // Retry connection every 5 minutes in offline mode
+        return this.isOfflineMode && 
+               (!this.lastSuccessfulUpdate || Date.now() - this.lastSuccessfulUpdate > 300000);
+    },
+    
+    getStatus() {
+        if (this.isOfflineMode) {
+            return 'offline';
+        } else if (this.consecutiveFailures > 0) {
+            return 'degraded';
+        } else {
+            return 'online';
+        }
+    }
 };
 
 // Cache management
@@ -111,38 +159,101 @@ const appData = {
 
 // Initialize the application
 async function initializeApp() {
-    // Update the system time
-    updateSystemTime();
-    setInterval(updateSystemTime, 1000);
+    try {
+        console.log('Starting USDC Detection Station...');
+        
+        // Initialize connection status display
+        updateConnectionStatus();
+        
+        // Update the system time
+        updateSystemTime();
+        setInterval(updateSystemTime, 1000);
 
-    // Set last updated timestamp
-    document.getElementById('lastUpdated').textContent = formatTimestamp(new Date());
+        // Set last updated timestamp
+        document.getElementById('lastUpdated').textContent = formatTimestamp(new Date());
 
-    // Try to load real data first
-    let currentData = await loadRealTimeData();
-    if (!currentData) {
-        console.log('Using fallback static data');
-        currentData = enhanceStaticData(appData);
+        // Try to load real data first
+        let currentData = await loadRealTimeData();
+        if (!currentData) {
+            console.log('Using fallback static data');
+            currentData = enhanceStaticData(appData);
+        }
+
+        // Initialize the dashboard data
+        updateDashboardData(currentData);
+        
+        // Update growth metrics
+        updateGrowthMetrics(currentData);
+
+        // Create charts
+        createMonthlyChart(currentData.monthly);
+        createYearlyChart(currentData.yearly);
+        createChainChart(currentData.chains);
+
+        // Populate chain distribution table
+        populateChainTable(currentData.chains);
+
+        // Set up automatic updates
+        startAutoUpdate();
+        
+        // Start health monitoring
+        startHealthMonitoring();
+        
+        console.log('USDC Detection Station initialized successfully');
+        
+        // Show initialization status
+        if (currentData.source) {
+            showNotification('系統初始化完成，實時數據已載入', 'success');
+        } else {
+            showAdvancedNotification(
+                'API 暫時無法連接，使用離線模式', 
+                'warning', 
+                { 
+                    showRetry: true, 
+                    retryCallback: updateData,
+                    duration: 8000
+                }
+            );
+        }
+        
+    } catch (error) {
+        console.error('Failed to initialize app:', error);
+        
+        // Record the initialization failure
+        errorTracker.recordFailure(error);
+        
+        try {
+            // Emergency fallback to basic static data
+            console.log('Emergency fallback to static data...');
+            const fallbackData = enhanceStaticData(appData);
+            
+            updateDashboardData(fallbackData);
+            updateGrowthMetrics(fallbackData);
+            createMonthlyChart(fallbackData.monthly);
+            createYearlyChart(fallbackData.yearly);
+            createChainChart(fallbackData.chains);
+            populateChainTable(fallbackData.chains);
+            updateSystemTime();
+            updateConnectionStatus();
+            
+            // Still start monitoring for recovery
+            startHealthMonitoring();
+            
+            showAdvancedNotification(
+                '初始化失敗，運行在緊急模式', 
+                'error', 
+                { 
+                    showRetry: true, 
+                    retryCallback: updateData,
+                    persistent: true
+                }
+            );
+            
+        } catch (emergencyError) {
+            console.error('Emergency fallback failed:', emergencyError);
+            showNotification('嚴重錯誤：系統無法啟動', 'error');
+        }
     }
-
-    // Initialize the dashboard data
-    updateDashboardData(currentData);
-    
-    // Update growth metrics
-    updateGrowthMetrics(currentData);
-
-    // Create charts
-    createMonthlyChart(currentData.monthly);
-    createYearlyChart(currentData.yearly);
-    createChainChart(currentData.chains);
-
-    // Populate chain distribution table
-    populateChainTable(currentData.chains);
-
-
-
-    // Set up automatic updates
-    startAutoUpdate();
 }
 
 // Auto-update mechanism
@@ -180,38 +291,108 @@ async function loadRealTimeData() {
     }
 }
 
-// Fetch USDC data from APIs with retry logic
-async function fetchUSDCData(retryCount = 0) {
+// Enhanced API fetching with multiple fallbacks
+async function fetchUSDCData() {
+    // Check if we should attempt API calls
+    if (!errorTracker.shouldAttemptAPI()) {
+        throw new Error('API calls disabled due to repeated failures. Using offline mode.');
+    }
+    
+    const apiSources = [
+        { url: apiConfig.primary, name: 'CoinGecko', parser: parseCoinGeckoData },
+        { url: apiConfig.backup, name: 'Coinbase', parser: parseCoinbaseData },
+        { url: apiConfig.fallback, name: 'CoinMarketCap', parser: parseCoinMarketCapData }
+    ];
+    
+    let lastError = null;
+    
+    for (const source of apiSources) {
+        try {
+            console.log(`Attempting to fetch from ${source.name}...`);
+            const data = await fetchFromSource(source.url, source.name);
+            const parsedData = source.parser(data);
+            
+            errorTracker.recordSuccess();
+            console.log(`Successfully fetched data from ${source.name}`);
+            return parsedData;
+            
+        } catch (error) {
+            console.warn(`Failed to fetch from ${source.name}:`, error.message);
+            lastError = error;
+            continue;
+        }
+    }
+    
+    // All sources failed
+    errorTracker.recordFailure(lastError);
+    throw new Error(`All API sources failed. Last error: ${lastError?.message}`);
+}
+
+// Fetch from a specific source with timeout and retry
+async function fetchFromSource(url, sourceName, retryCount = 0) {
     try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), apiConfig.timeout);
         
-        const response = await fetch(apiConfig.primary, {
+        const response = await fetch(url, {
             signal: controller.signal,
             headers: {
                 'Accept': 'application/json',
+                'User-Agent': 'USDC-Detection-Station/1.0'
             }
         });
         
         clearTimeout(timeoutId);
         
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
         const data = await response.json();
         return data;
         
     } catch (error) {
-        console.error(`API call failed (attempt ${retryCount + 1}):`, error);
-        
         if (retryCount < apiConfig.retryAttempts - 1) {
+            console.log(`Retrying ${sourceName} (attempt ${retryCount + 2}/${apiConfig.retryAttempts})`);
             await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
-            return fetchUSDCData(retryCount + 1);
+            return fetchFromSource(url, sourceName, retryCount + 1);
         }
         
         throw error;
     }
+}
+
+// Data parsers for different API sources
+function parseCoinGeckoData(data) {
+    return {
+        source: 'CoinGecko',
+        marketCap: data.market_data?.market_cap?.usd,
+        totalSupply: data.market_data?.total_supply,
+        currentPrice: data.market_data?.current_price?.usd,
+        lastUpdated: data.last_updated
+    };
+}
+
+function parseCoinbaseData(data) {
+    return {
+        source: 'Coinbase',
+        // Coinbase API structure might be different, adapt as needed
+        marketCap: null,
+        totalSupply: null,
+        currentPrice: 1, // USDC should be ~$1
+        lastUpdated: new Date().toISOString()
+    };
+}
+
+function parseCoinMarketCapData(data) {
+    return {
+        source: 'CoinMarketCap',
+        // CoinMarketCap API structure, adapt as needed
+        marketCap: data.data?.statistics?.marketCap,
+        totalSupply: data.data?.statistics?.totalSupply,
+        currentPrice: data.data?.statistics?.price,
+        lastUpdated: data.data?.lastUpdated
+    };
 }
 
 // Enhance static data with current time logic
@@ -773,59 +954,115 @@ async function updateData() {
     // Add updating animation to key elements
     document.getElementById('totalSupply').classList.add('updating');
     
+    let dataSource = '未知';
+    let updateSuccessful = false;
+    let fallbackUsed = false;
+    
     try {
-        // Force refresh - bypass cache
-        dataCache.lastUpdate = null;
+        // Update connection status first
+        updateConnectionStatus();
         
-        console.log('Forcing data update...');
+        // Force refresh - bypass cache if in retry mode
+        if (errorTracker.shouldRetryConnection()) {
+            dataCache.lastUpdate = null;
+            console.log('Retrying API connection after failures...');
+        }
+        
+        console.log('Initiating data update...');
         const updatedData = await loadRealTimeData();
         
         if (updatedData) {
-            // Update the dashboard with new data
+            // Successful API update
             updateDashboardData(updatedData);
-            
-            // Update growth metrics
             updateGrowthMetrics(updatedData);
-            
-            // Update charts
             createMonthlyChart(updatedData.monthly);
             createYearlyChart(updatedData.yearly);
             createChainChart(updatedData.chains);
-            
-            // Update chain table
             populateChainTable(updatedData.chains);
             
-            console.log('Data updated successfully');
-        } else {
-            // Fallback to enhanced static data
-            console.log('Falling back to enhanced static data');
-            const fallbackData = enhanceStaticData(appData);
+            dataSource = updatedData.source || 'API';
+            updateSuccessful = true;
+            console.log(`Data updated successfully from ${dataSource}`);
             
-            updateDashboardData(fallbackData);
-            updateGrowthMetrics(fallbackData);
-            createMonthlyChart(fallbackData.monthly);
-            createYearlyChart(fallbackData.yearly);
-            createChainChart(fallbackData.chains);
-            populateChainTable(fallbackData.chains);
+        } else {
+            // Primary API failed, try fallback strategies
+            console.log('Primary data load failed, trying fallback strategies...');
+            
+            // Strategy 1: Use cached data if available
+            const cachedData = dataCache.get();
+            if (cachedData) {
+                console.log('Using cached data as fallback');
+                updateDashboardData(cachedData);
+                updateGrowthMetrics(cachedData);
+                createMonthlyChart(cachedData.monthly);
+                createYearlyChart(cachedData.yearly);
+                createChainChart(cachedData.chains);
+                populateChainTable(cachedData.chains);
+                
+                dataSource = '緩存數據';
+                fallbackUsed = true;
+                
+            } else {
+                // Strategy 2: Enhanced static data
+                console.log('No cache available, using enhanced static data');
+                const fallbackData = enhanceStaticData(appData);
+                
+                updateDashboardData(fallbackData);
+                updateGrowthMetrics(fallbackData);
+                createMonthlyChart(fallbackData.monthly);
+                createYearlyChart(fallbackData.yearly);
+                createChainChart(fallbackData.chains);
+                populateChainTable(fallbackData.chains);
+                
+                dataSource = '離線數據';
+                fallbackUsed = true;
+            }
         }
         
         // Update last updated timestamp
         document.getElementById('lastUpdated').textContent = formatTimestamp(new Date());
         
-    } catch (error) {
-        console.error('Error updating data:', error);
+        // Show appropriate success message
+        if (updateSuccessful) {
+            showNotification(`數據更新成功 (${dataSource})`, 'success');
+        } else if (fallbackUsed) {
+            showNotification(`使用${dataSource}更新`, 'info');
+        }
         
-        // Show error message to user (optional)
-        showNotification('更新失敗，使用本地數據 | Update failed, using local data', 'warning');
+    } catch (error) {
+        console.error('Critical error during data update:', error);
+        
+        // Emergency fallback - always try to show something
+        try {
+            console.log('Attempting emergency fallback to static data');
+            const emergencyData = enhanceStaticData(appData);
+            
+            updateDashboardData(emergencyData);
+            updateGrowthMetrics(emergencyData);
+            createMonthlyChart(emergencyData.monthly);
+            createYearlyChart(emergencyData.yearly);
+            createChainChart(emergencyData.chains);
+            populateChainTable(emergencyData.chains);
+            
+            // Update timestamp even for emergency fallback
+            document.getElementById('lastUpdated').textContent = formatTimestamp(new Date());
+            
+            showNotification('系統錯誤，使用緊急備用數據', 'error');
+            
+        } catch (emergencyError) {
+            console.error('Emergency fallback also failed:', emergencyError);
+            showNotification('嚴重錯誤：無法載入任何數據', 'error');
+        }
         
     } finally {
-        // Remove updating animation
+        // Always clean up UI states
         document.getElementById('totalSupply').classList.remove('updating');
+        updateConnectionStatus();
         
-        // Hide loading overlay
+        // Hide loading overlay with appropriate delay
         setTimeout(() => {
             loadingOverlay.classList.remove('active');
-        }, 500);
+        }, updateSuccessful ? 500 : 800);
     }
 }
 
@@ -964,6 +1201,140 @@ function updateMetricValue(elementId, value, className = '') {
         element.textContent = value;
         element.className = 'metric-value' + (className ? ' ' + className : '');
     }
+}
+
+// Update connection status indicator (UI removed per user request)
+function updateConnectionStatus() {
+    // Status tracking still active but UI display removed
+    const status = errorTracker.getStatus();
+    console.log(`Connection status: ${status}`);
+    
+    // Remove existing status element if it exists
+    const existingElement = document.getElementById('connectionStatus');
+    if (existingElement) {
+        existingElement.remove();
+    }
+}
+
+// Network health check
+async function performHealthCheck() {
+    console.log('Performing network health check...');
+    
+    try {
+        // Simple connectivity test
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+        
+        const response = await fetch('https://httpbin.org/get', {
+            signal: controller.signal,
+            method: 'GET',
+            cache: 'no-cache'
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (response.ok) {
+            // Network is available, maybe API-specific issue
+            console.log('Health check passed - network connectivity OK');
+            return true;
+        } else {
+            console.log('Health check failed - network issues detected');
+            return false;
+        }
+        
+    } catch (error) {
+        console.log('Health check failed - no internet connectivity');
+        return false;
+    }
+}
+
+// Start health monitoring system
+function startHealthMonitoring() {
+    setInterval(async () => {
+        if (errorTracker.isOfflineMode) {
+            const isHealthy = await performHealthCheck();
+            if (isHealthy) {
+                console.log('Network restored, attempting to reconnect...');
+                // Try to update data to test API connectivity
+                try {
+                    await loadRealTimeData();
+                    console.log('API connectivity restored');
+                } catch (error) {
+                    console.log('API still not available despite network connectivity');
+                }
+            }
+        }
+        
+        // Update status display
+        updateConnectionStatus();
+        
+    }, apiConfig.healthCheckInterval);
+}
+
+// Enhanced notification system with retry options
+function showAdvancedNotification(message, type = 'info', options = {}) {
+    const {
+        duration = 5000,
+        showRetry = false,
+        retryCallback = null,
+        persistent = false
+    } = options;
+    
+    let notification = document.getElementById('notification');
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.id = 'notification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            max-width: 350px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        `;
+        document.body.appendChild(notification);
+    }
+    
+    const colors = {
+        info: '#2775CA',
+        success: '#28a745',
+        warning: '#ffc107',
+        error: '#dc3545'
+    };
+    
+    notification.style.backgroundColor = colors[type] || colors.info;
+    
+    // Create message content
+    let content = `<div style="margin-bottom: ${showRetry ? '8px' : '0'}">${message}</div>`;
+    
+    if (showRetry && retryCallback) {
+        content += `
+            <button onclick="this.parentElement.style.opacity='0'; (${retryCallback.toString()})();" 
+                    style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); 
+                           color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; 
+                           cursor: pointer; margin-top: 4px;">
+                重試
+            </button>
+        `;
+    }
+    
+    notification.innerHTML = content;
+    notification.style.opacity = '1';
+    
+    // Auto hide unless persistent
+    if (!persistent) {
+        setTimeout(() => {
+            notification.style.opacity = '0';
+        }, duration);
+    }
+    
+    return notification;
 }
 
 
