@@ -64,6 +64,43 @@
                 </div>
             </section>
 
+            <!-- Analytics Panel -->
+            <section class="analytics-section">
+                <div class="card analytics-card">
+                    <div class="card__body">
+                        <div class="analytics-header">
+                            <h3>數據分析面板</h3>
+                            <p class="analytics-subtitle">Data Analytics Dashboard</p>
+                        </div>
+                        <div class="analytics-grid">
+                            <div class="metric-item">
+                                <div class="metric-label">波動率指數 | Volatility Index</div>
+                                <div class="metric-value" id="volatilityIndex">--</div>
+                                <div class="metric-desc">月度增長率標準差</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">平均月增長 | Avg Monthly Growth</div>
+                                <div class="metric-value" id="avgGrowth">--</div>
+                                <div class="metric-desc">過去12個月平均</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">異常檢測 | Anomaly Detection</div>
+                                <div class="metric-value" id="anomalyCount">--</div>
+                                <div class="metric-desc">統計異常數據點</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">趨勢狀態 | Trend Status</div>
+                                <div class="metric-value" id="trendStatus">--</div>
+                                <div class="metric-desc">基於移動平均</div>
+                            </div>
+                        </div>
+                        <div class="anomaly-alerts" id="anomalyAlerts">
+                            <!-- Dynamic anomaly alerts will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Charts Section -->
             <section class="charts-section">
                 <div class="charts-grid">
@@ -72,7 +109,15 @@
                         <div class="card__body">
                             <div class="chart-header">
                                 <h3>每月供應量趨勢</h3>
-                                <p class="chart-subtitle">Monthly Supply Trend</p>
+                                <p class="chart-subtitle">Monthly Supply Trend with Analytics</p>
+                                <div class="chart-controls">
+                                    <button class="btn btn--sm chart-toggle" data-chart="monthly" data-type="line">
+                                        📈 線圖
+                                    </button>
+                                    <button class="btn btn--sm chart-toggle" data-chart="monthly" data-type="area">
+                                        📊 面積圖
+                                    </button>
+                                </div>
                             </div>
                             <div class="chart-container">
                                 <canvas id="monthlyChart"></canvas>
@@ -86,6 +131,14 @@
                             <div class="chart-header">
                                 <h3>每年供應量趨勢</h3>
                                 <p class="chart-subtitle">Yearly Supply Trend</p>
+                                <div class="chart-controls">
+                                    <button class="btn btn--sm chart-toggle" data-chart="yearly" data-type="bar">
+                                        📊 柱狀圖
+                                    </button>
+                                    <button class="btn btn--sm chart-toggle" data-chart="yearly" data-type="line">
+                                        📈 線圖
+                                    </button>
+                                </div>
                             </div>
                             <div class="chart-container">
                                 <canvas id="yearlyChart"></canvas>

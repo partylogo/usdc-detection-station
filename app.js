@@ -127,6 +127,9 @@ async function initializeApp() {
 
     // Initialize the dashboard data
     updateDashboardData(currentData);
+    
+    // Update analytics panel
+    updateAnalyticsPanel(currentData);
 
     // Create charts
     createMonthlyChart(currentData.monthly);
@@ -135,6 +138,9 @@ async function initializeApp() {
 
     // Populate chain distribution table
     populateChainTable(currentData.chains);
+
+    // Set up chart controls
+    setupChartControls();
 
     // Set up automatic updates
     startAutoUpdate();
@@ -325,6 +331,69 @@ function formatNumber(number) {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+// Calculate moving average
+function calculateMovingAverage(data, window) {
+    const result = [];
+    for (let i = 0; i < data.length; i++) {
+        if (i < window - 1) {
+            result.push(null);
+        } else {
+            const sum = data.slice(i - window + 1, i + 1).reduce((a, b) => a + b, 0);
+            result.push(sum / window);
+        }
+    }
+    return result;
+}
+
+// Calculate growth rate (month-over-month percentage)
+function calculateGrowthRate(data) {
+    const result = [];
+    for (let i = 0; i < data.length; i++) {
+        if (i === 0) {
+            result.push(null);
+        } else {
+            const current = data[i];
+            const previous = data[i - 1];
+            const growthRate = ((current - previous) / previous) * 100;
+            result.push(growthRate);
+        }
+    }
+    return result;
+}
+
+// Calculate volatility index
+function calculateVolatility(data) {
+    const growthRates = calculateGrowthRate(data).filter(rate => rate !== null);
+    if (growthRates.length === 0) return 0;
+    
+    const mean = growthRates.reduce((sum, rate) => sum + rate, 0) / growthRates.length;
+    const variance = growthRates.reduce((sum, rate) => sum + Math.pow(rate - mean, 2), 0) / growthRates.length;
+    return Math.sqrt(variance);
+}
+
+// Detect anomalies in data
+function detectAnomalies(data) {
+    const growthRates = calculateGrowthRate(data).filter(rate => rate !== null);
+    if (growthRates.length === 0) return [];
+    
+    const mean = growthRates.reduce((sum, rate) => sum + rate, 0) / growthRates.length;
+    const stdDev = Math.sqrt(growthRates.reduce((sum, rate) => sum + Math.pow(rate - mean, 2), 0) / growthRates.length);
+    
+    const anomalies = [];
+    growthRates.forEach((rate, index) => {
+        if (Math.abs(rate - mean) > 2 * stdDev) {
+            anomalies.push({
+                index: index + 1, // +1 because growth rates start from index 1
+                value: rate,
+                type: rate > mean ? 'spike' : 'drop',
+                severity: Math.abs(rate - mean) / stdDev
+            });
+        }
+    });
+    
+    return anomalies;
+}
+
 // Format timestamp
 function formatTimestamp(date) {
     const options = {
@@ -381,13 +450,19 @@ function updateQuarterlySummary(data) {
     }
 }
 
-// Create the monthly supply chart
+// Create the monthly supply chart with advanced features
 function createMonthlyChart(data) {
     const ctx = document.getElementById('monthlyChart').getContext('2d');
     
     // Prepare data
     const labels = data.map(item => item.date);
     const supplyData = data.map(item => item.supply);
+    
+    // Calculate moving average (3-month)
+    const movingAverage = calculateMovingAverage(supplyData, 3);
+    
+    // Calculate growth rate
+    const growthRate = calculateGrowthRate(supplyData);
     
     // Create chart
     if (monthlyChart) {
@@ -398,21 +473,49 @@ function createMonthlyChart(data) {
         type: 'line',
         data: {
             labels: labels,
-            datasets: [{
-                label: 'USDC 供應量（百萬美元） | USDC Supply (Million USD)',
-                data: supplyData,
-                borderColor: '#2775CA',
-                backgroundColor: 'rgba(39, 117, 202, 0.1)',
-                borderWidth: 3,
-                pointBackgroundColor: '#2775CA',
-                pointRadius: 4,
-                tension: 0.2,
-                fill: true
-            }]
+            datasets: [
+                {
+                    label: 'USDC 供應量 | USDC Supply',
+                    data: supplyData,
+                    borderColor: '#2775CA',
+                    backgroundColor: 'rgba(39, 117, 202, 0.1)',
+                    borderWidth: 3,
+                    pointBackgroundColor: '#2775CA',
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    tension: 0.2,
+                    fill: true,
+                    yAxisID: 'y'
+                },
+                {
+                    label: '3月移動平均 | 3-Month Moving Average',
+                    data: movingAverage,
+                    borderColor: '#FF6B6B',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    tension: 0.4,
+                    borderDash: [5, 5],
+                    yAxisID: 'y'
+                },
+                {
+                    label: '月增長率 % | Monthly Growth %',
+                    data: growthRate,
+                    type: 'bar',
+                    backgroundColor: growthRate.map(rate => rate >= 0 ? 'rgba(40, 167, 69, 0.6)' : 'rgba(220, 53, 69, 0.6)'),
+                    borderColor: growthRate.map(rate => rate >= 0 ? '#28a745' : '#dc3545'),
+                    borderWidth: 1,
+                    yAxisID: 'y1'
+                }
+            ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
             plugins: {
                 legend: {
                     display: true,
@@ -420,16 +523,45 @@ function createMonthlyChart(data) {
                     labels: {
                         usePointStyle: true,
                         font: {
-                            size: 12
-                        }
+                            size: 11
+                        },
+                        padding: 15
                     }
                 },
                 tooltip: {
                     mode: 'index',
                     intersect: false,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
                     callbacks: {
+                        title: function(context) {
+                            return `${context[0].label} 月份數據`;
+                        },
                         label: function(context) {
-                            return `USDC: $${formatNumber(context.raw)}M`;
+                            const datasetLabel = context.dataset.label;
+                            const value = context.raw;
+                            
+                            if (datasetLabel.includes('Growth')) {
+                                return `${datasetLabel}: ${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
+                            } else {
+                                return `${datasetLabel}: $${formatNumber(value)}M`;
+                            }
+                        },
+                        afterBody: function(context) {
+                            const dataIndex = context[0].dataIndex;
+                            if (dataIndex > 0) {
+                                const current = supplyData[dataIndex];
+                                const previous = supplyData[dataIndex - 1];
+                                const change = current - previous;
+                                const changePercent = ((change / previous) * 100).toFixed(1);
+                                return [
+                                    '',
+                                    `月變化: ${change >= 0 ? '+' : ''}$${formatNumber(Math.abs(change))}M`,
+                                    `變化率: ${change >= 0 ? '+' : ''}${changePercent}%`
+                                ];
+                            }
+                            return [];
                         }
                     }
                 }
@@ -441,10 +573,16 @@ function createMonthlyChart(data) {
                     },
                     ticks: {
                         maxRotation: 45,
-                        minRotation: 45
+                        minRotation: 45,
+                        font: {
+                            size: 10
+                        }
                     }
                 },
                 y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
                     beginAtZero: false,
                     grid: {
                         color: 'rgba(0, 0, 0, 0.05)'
@@ -452,9 +590,32 @@ function createMonthlyChart(data) {
                     ticks: {
                         callback: function(value) {
                             return '$' + formatNumber(value) + 'M';
+                        },
+                        font: {
+                            size: 10
+                        }
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    beginAtZero: true,
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return value.toFixed(1) + '%';
+                        },
+                        font: {
+                            size: 10
                         }
                     }
                 }
+            },
+            onHover: (event, activeElements) => {
+                event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
             }
         }
     });
@@ -669,6 +830,9 @@ async function updateData() {
             // Update the dashboard with new data
             updateDashboardData(updatedData);
             
+            // Update analytics panel
+            updateAnalyticsPanel(updatedData);
+            
             // Update charts
             createMonthlyChart(updatedData.monthly);
             createYearlyChart(updatedData.yearly);
@@ -684,6 +848,7 @@ async function updateData() {
             const fallbackData = enhanceStaticData(appData);
             
             updateDashboardData(fallbackData);
+            updateAnalyticsPanel(fallbackData);
             createMonthlyChart(fallbackData.monthly);
             createYearlyChart(fallbackData.yearly);
             createChainChart(fallbackData.chains);
@@ -810,4 +975,152 @@ function simulateDataUpdate(originalData) {
     clone.chains[lastIndex].amount = Math.max(0, remainingAmount);
     
     return clone;
+}
+
+// Update analytics panel with calculated metrics
+function updateAnalyticsPanel(data) {
+    const monthlySupply = data.monthly.map(item => item.supply);
+    
+    // Calculate metrics
+    const volatility = calculateVolatility(monthlySupply);
+    const growthRates = calculateGrowthRate(monthlySupply).filter(rate => rate !== null);
+    const avgGrowth = growthRates.length > 0 ? growthRates.reduce((sum, rate) => sum + rate, 0) / growthRates.length : 0;
+    const anomalies = detectAnomalies(monthlySupply);
+    
+    // Determine trend status
+    const recentData = monthlySupply.slice(-3);
+    const trendStatus = determineTrendStatus(recentData);
+    
+    // Update DOM elements
+    updateMetricValue('volatilityIndex', volatility.toFixed(2) + '%', volatility > 15 ? 'warning' : '');
+    updateMetricValue('avgGrowth', (avgGrowth >= 0 ? '+' : '') + avgGrowth.toFixed(1) + '%', avgGrowth >= 0 ? 'positive' : 'negative');
+    updateMetricValue('anomalyCount', anomalies.length.toString(), anomalies.length > 0 ? 'warning' : '');
+    updateMetricValue('trendStatus', trendStatus.label, trendStatus.class);
+    
+    // Display anomaly alerts
+    displayAnomalyAlerts(anomalies, data.monthly);
+}
+
+// Helper function to update metric values
+function updateMetricValue(elementId, value, className = '') {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = value;
+        element.className = 'metric-value' + (className ? ' ' + className : '');
+    }
+}
+
+// Determine trend status based on recent data
+function determineTrendStatus(recentData) {
+    if (recentData.length < 2) return { label: '數據不足', class: '' };
+    
+    const trend = recentData[recentData.length - 1] - recentData[0];
+    const trendPercent = (trend / recentData[0]) * 100;
+    
+    if (Math.abs(trendPercent) < 2) {
+        return { label: '📊 穩定', class: '' };
+    } else if (trendPercent > 5) {
+        return { label: '📈 強勢上升', class: 'positive' };
+    } else if (trendPercent > 0) {
+        return { label: '📈 溫和上升', class: 'positive' };
+    } else if (trendPercent < -5) {
+        return { label: '📉 急劇下降', class: 'negative' };
+    } else {
+        return { label: '📉 輕微下降', class: 'negative' };
+    }
+}
+
+// Display anomaly alerts
+function displayAnomalyAlerts(anomalies, monthlyData) {
+    const alertsContainer = document.getElementById('anomalyAlerts');
+    if (!alertsContainer) return;
+    
+    alertsContainer.innerHTML = '';
+    
+    if (anomalies.length === 0) {
+        alertsContainer.innerHTML = '<div class="no-anomalies">✅ 未檢測到統計異常</div>';
+        return;
+    }
+    
+    anomalies.forEach(anomaly => {
+        const monthData = monthlyData[anomaly.index];
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `anomaly-alert ${anomaly.type}`;
+        
+        const icon = anomaly.type === 'spike' ? '🚀' : '⚠️';
+        const typeText = anomaly.type === 'spike' ? '異常增長' : '異常下降';
+        const severityText = anomaly.severity > 3 ? '極端' : '顯著';
+        
+        alertDiv.innerHTML = `
+            <span class="anomaly-icon">${icon}</span>
+            <div>
+                <strong>${monthData.date}</strong>: ${severityText}${typeText}
+                <div style="font-size: 0.9em; opacity: 0.8;">
+                    變化率: ${anomaly.value >= 0 ? '+' : ''}${anomaly.value.toFixed(1)}%
+                </div>
+            </div>
+        `;
+        
+        alertsContainer.appendChild(alertDiv);
+    });
+}
+
+// Setup chart controls for switching chart types
+function setupChartControls() {
+    const chartToggles = document.querySelectorAll('.chart-toggle');
+    
+    chartToggles.forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            const chartType = this.dataset.chart;
+            const displayType = this.dataset.type;
+            
+            // Update active state
+            const siblingToggles = this.parentElement.querySelectorAll('.chart-toggle');
+            siblingToggles.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Switch chart display
+            switchChartType(chartType, displayType);
+        });
+    });
+    
+    // Set initial active states
+    const monthlyLineBtn = document.querySelector('[data-chart="monthly"][data-type="line"]');
+    const yearlyBarBtn = document.querySelector('[data-chart="yearly"][data-type="bar"]');
+    
+    if (monthlyLineBtn) monthlyLineBtn.classList.add('active');
+    if (yearlyBarBtn) yearlyBarBtn.classList.add('active');
+}
+
+// Switch chart display type
+function switchChartType(chartType, displayType) {
+    const currentData = dataCache.get() || enhanceStaticData(appData);
+    
+    if (chartType === 'monthly') {
+        updateMonthlyChartType(currentData.monthly, displayType);
+    } else if (chartType === 'yearly') {
+        updateYearlyChartType(currentData.yearly, displayType);
+    }
+}
+
+// Update monthly chart display type
+function updateMonthlyChartType(data, type) {
+    if (monthlyChart) {
+        if (type === 'area') {
+            monthlyChart.data.datasets[0].fill = true;
+            monthlyChart.data.datasets[0].backgroundColor = 'rgba(39, 117, 202, 0.3)';
+        } else {
+            monthlyChart.data.datasets[0].fill = false;
+            monthlyChart.data.datasets[0].backgroundColor = 'rgba(39, 117, 202, 0.1)';
+        }
+        monthlyChart.update('none');
+    }
+}
+
+// Update yearly chart display type  
+function updateYearlyChartType(data, type) {
+    if (yearlyChart) {
+        yearlyChart.config.type = type;
+        yearlyChart.update('none');
+    }
 }
