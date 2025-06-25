@@ -139,8 +139,7 @@ async function initializeApp() {
     // Populate chain distribution table
     populateChainTable(currentData.chains);
 
-    // Set up chart controls
-    setupChartControls();
+
 
     // Set up automatic updates
     startAutoUpdate();
@@ -1065,62 +1064,3 @@ function displayAnomalyAlerts(anomalies, monthlyData) {
     });
 }
 
-// Setup chart controls for switching chart types
-function setupChartControls() {
-    const chartToggles = document.querySelectorAll('.chart-toggle');
-    
-    chartToggles.forEach(toggle => {
-        toggle.addEventListener('click', function() {
-            const chartType = this.dataset.chart;
-            const displayType = this.dataset.type;
-            
-            // Update active state
-            const siblingToggles = this.parentElement.querySelectorAll('.chart-toggle');
-            siblingToggles.forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Switch chart display
-            switchChartType(chartType, displayType);
-        });
-    });
-    
-    // Set initial active states
-    const monthlyLineBtn = document.querySelector('[data-chart="monthly"][data-type="line"]');
-    const yearlyBarBtn = document.querySelector('[data-chart="yearly"][data-type="bar"]');
-    
-    if (monthlyLineBtn) monthlyLineBtn.classList.add('active');
-    if (yearlyBarBtn) yearlyBarBtn.classList.add('active');
-}
-
-// Switch chart display type
-function switchChartType(chartType, displayType) {
-    const currentData = dataCache.get() || enhanceStaticData(appData);
-    
-    if (chartType === 'monthly') {
-        updateMonthlyChartType(currentData.monthly, displayType);
-    } else if (chartType === 'yearly') {
-        updateYearlyChartType(currentData.yearly, displayType);
-    }
-}
-
-// Update monthly chart display type
-function updateMonthlyChartType(data, type) {
-    if (monthlyChart) {
-        if (type === 'area') {
-            monthlyChart.data.datasets[0].fill = true;
-            monthlyChart.data.datasets[0].backgroundColor = 'rgba(39, 117, 202, 0.3)';
-        } else {
-            monthlyChart.data.datasets[0].fill = false;
-            monthlyChart.data.datasets[0].backgroundColor = 'rgba(39, 117, 202, 0.1)';
-        }
-        monthlyChart.update('none');
-    }
-}
-
-// Update yearly chart display type  
-function updateYearlyChartType(data, type) {
-    if (yearlyChart) {
-        yearlyChart.config.type = type;
-        yearlyChart.update('none');
-    }
-}

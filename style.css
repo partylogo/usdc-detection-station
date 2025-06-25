@@ -1282,32 +1282,7 @@ select.form-control {
   border-radius: var(--radius-base);
 }
 
-/* Chart Controls */
-.chart-controls {
-  display: flex;
-  gap: var(--space-8);
-  justify-content: center;
-  margin-top: var(--space-12);
-}
 
-.chart-toggle {
-  background: var(--color-background);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-xs);
-  padding: var(--space-6) var(--space-12);
-}
-
-.chart-toggle:hover {
-  background: var(--color-secondary);
-  color: var(--color-text);
-}
-
-.chart-toggle.active {
-  background: var(--color-usdc-primary);
-  color: white;
-  border-color: var(--color-usdc-primary);
-}
 
 /* Notification styles */
 #notification {
@@ -1322,9 +1297,7 @@ select.form-control {
     grid-template-columns: repeat(2, 1fr);
   }
   
-  .chart-controls {
-    flex-wrap: wrap;
-  }
+
 }
 
 @media (max-width: 480px) {
