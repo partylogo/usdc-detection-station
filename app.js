@@ -457,9 +457,6 @@ function createMonthlyChart(data) {
     const labels = data.map(item => item.date);
     const supplyData = data.map(item => item.supply);
     
-    // Calculate moving average (3-month)
-    const movingAverage = calculateMovingAverage(supplyData, 3);
-    
     // Calculate growth rate
     const growthRate = calculateGrowthRate(supplyData);
     
@@ -484,17 +481,6 @@ function createMonthlyChart(data) {
                     pointHoverRadius: 8,
                     tension: 0.2,
                     fill: true,
-                    yAxisID: 'y'
-                },
-                {
-                    label: '3月移動平均 | 3-Month Moving Average',
-                    data: movingAverage,
-                    borderColor: '#FF6B6B',
-                    backgroundColor: 'transparent',
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    tension: 0.4,
-                    borderDash: [5, 5],
                     yAxisID: 'y'
                 },
                 {
