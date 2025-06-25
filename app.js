@@ -128,8 +128,8 @@ async function initializeApp() {
     // Initialize the dashboard data
     updateDashboardData(currentData);
     
-    // Update analytics panel
-    updateAnalyticsPanel(currentData);
+    // Update growth metrics
+    updateGrowthMetrics(currentData);
 
     // Create charts
     createMonthlyChart(currentData.monthly);
@@ -360,38 +360,7 @@ function calculateGrowthRate(data) {
     return result;
 }
 
-// Calculate volatility index
-function calculateVolatility(data) {
-    const growthRates = calculateGrowthRate(data).filter(rate => rate !== null);
-    if (growthRates.length === 0) return 0;
-    
-    const mean = growthRates.reduce((sum, rate) => sum + rate, 0) / growthRates.length;
-    const variance = growthRates.reduce((sum, rate) => sum + Math.pow(rate - mean, 2), 0) / growthRates.length;
-    return Math.sqrt(variance);
-}
 
-// Detect anomalies in data
-function detectAnomalies(data) {
-    const growthRates = calculateGrowthRate(data).filter(rate => rate !== null);
-    if (growthRates.length === 0) return [];
-    
-    const mean = growthRates.reduce((sum, rate) => sum + rate, 0) / growthRates.length;
-    const stdDev = Math.sqrt(growthRates.reduce((sum, rate) => sum + Math.pow(rate - mean, 2), 0) / growthRates.length);
-    
-    const anomalies = [];
-    growthRates.forEach((rate, index) => {
-        if (Math.abs(rate - mean) > 2 * stdDev) {
-            anomalies.push({
-                index: index + 1, // +1 because growth rates start from index 1
-                value: rate,
-                type: rate > mean ? 'spike' : 'drop',
-                severity: Math.abs(rate - mean) / stdDev
-            });
-        }
-    });
-    
-    return anomalies;
-}
 
 // Format timestamp
 function formatTimestamp(date) {
@@ -815,8 +784,8 @@ async function updateData() {
             // Update the dashboard with new data
             updateDashboardData(updatedData);
             
-            // Update analytics panel
-            updateAnalyticsPanel(updatedData);
+            // Update growth metrics
+            updateGrowthMetrics(updatedData);
             
             // Update charts
             createMonthlyChart(updatedData.monthly);
@@ -833,7 +802,7 @@ async function updateData() {
             const fallbackData = enhanceStaticData(appData);
             
             updateDashboardData(fallbackData);
-            updateAnalyticsPanel(fallbackData);
+            updateGrowthMetrics(fallbackData);
             createMonthlyChart(fallbackData.monthly);
             createYearlyChart(fallbackData.yearly);
             createChainChart(fallbackData.chains);
@@ -962,28 +931,30 @@ function simulateDataUpdate(originalData) {
     return clone;
 }
 
-// Update analytics panel with calculated metrics
-function updateAnalyticsPanel(data) {
+// Update growth metrics in supply overview
+function updateGrowthMetrics(data) {
     const monthlySupply = data.monthly.map(item => item.supply);
     
-    // Calculate metrics
-    const volatility = calculateVolatility(monthlySupply);
+    // Calculate growth rates
     const growthRates = calculateGrowthRate(monthlySupply).filter(rate => rate !== null);
-    const avgGrowth = growthRates.length > 0 ? growthRates.reduce((sum, rate) => sum + rate, 0) / growthRates.length : 0;
-    const anomalies = detectAnomalies(monthlySupply);
     
-    // Determine trend status
-    const recentData = monthlySupply.slice(-3);
-    const trendStatus = determineTrendStatus(recentData);
+    // Calculate 12-month average growth
+    const avg12MonthGrowth = growthRates.length > 0 ? 
+        growthRates.reduce((sum, rate) => sum + rate, 0) / growthRates.length : 0;
+    
+    // Calculate 3-month average growth (most recent 3 months)
+    const recent3MonthGrowth = growthRates.slice(-3);
+    const avg3MonthGrowth = recent3MonthGrowth.length > 0 ? 
+        recent3MonthGrowth.reduce((sum, rate) => sum + rate, 0) / recent3MonthGrowth.length : 0;
     
     // Update DOM elements
-    updateMetricValue('volatilityIndex', volatility.toFixed(2) + '%', volatility > 15 ? 'warning' : '');
-    updateMetricValue('avgGrowth', (avgGrowth >= 0 ? '+' : '') + avgGrowth.toFixed(1) + '%', avgGrowth >= 0 ? 'positive' : 'negative');
-    updateMetricValue('anomalyCount', anomalies.length.toString(), anomalies.length > 0 ? 'warning' : '');
-    updateMetricValue('trendStatus', trendStatus.label, trendStatus.class);
+    updateMetricValue('avg12MonthGrowth', 
+        (avg12MonthGrowth >= 0 ? '+' : '') + avg12MonthGrowth.toFixed(1) + '%', 
+        avg12MonthGrowth >= 0 ? 'positive' : 'negative');
     
-    // Display anomaly alerts
-    displayAnomalyAlerts(anomalies, data.monthly);
+    updateMetricValue('avg3MonthGrowth', 
+        (avg3MonthGrowth >= 0 ? '+' : '') + avg3MonthGrowth.toFixed(1) + '%', 
+        avg3MonthGrowth >= 0 ? 'positive' : 'negative');
 }
 
 // Helper function to update metric values
@@ -995,58 +966,5 @@ function updateMetricValue(elementId, value, className = '') {
     }
 }
 
-// Determine trend status based on recent data
-function determineTrendStatus(recentData) {
-    if (recentData.length < 2) return { label: '數據不足', class: '' };
-    
-    const trend = recentData[recentData.length - 1] - recentData[0];
-    const trendPercent = (trend / recentData[0]) * 100;
-    
-    if (Math.abs(trendPercent) < 2) {
-        return { label: '📊 穩定', class: '' };
-    } else if (trendPercent > 5) {
-        return { label: '📈 強勢上升', class: 'positive' };
-    } else if (trendPercent > 0) {
-        return { label: '📈 溫和上升', class: 'positive' };
-    } else if (trendPercent < -5) {
-        return { label: '📉 急劇下降', class: 'negative' };
-    } else {
-        return { label: '📉 輕微下降', class: 'negative' };
-    }
-}
 
-// Display anomaly alerts
-function displayAnomalyAlerts(anomalies, monthlyData) {
-    const alertsContainer = document.getElementById('anomalyAlerts');
-    if (!alertsContainer) return;
-    
-    alertsContainer.innerHTML = '';
-    
-    if (anomalies.length === 0) {
-        alertsContainer.innerHTML = '<div class="no-anomalies">✅ 未檢測到統計異常</div>';
-        return;
-    }
-    
-    anomalies.forEach(anomaly => {
-        const monthData = monthlyData[anomaly.index];
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `anomaly-alert ${anomaly.type}`;
-        
-        const icon = anomaly.type === 'spike' ? '🚀' : '⚠️';
-        const typeText = anomaly.type === 'spike' ? '異常增長' : '異常下降';
-        const severityText = anomaly.severity > 3 ? '極端' : '顯著';
-        
-        alertDiv.innerHTML = `
-            <span class="anomaly-icon">${icon}</span>
-            <div>
-                <strong>${monthData.date}</strong>: ${severityText}${typeText}
-                <div style="font-size: 0.9em; opacity: 0.8;">
-                    變化率: ${anomaly.value >= 0 ? '+' : ''}${anomaly.value.toFixed(1)}%
-                </div>
-            </div>
-        `;
-        
-        alertsContainer.appendChild(alertDiv);
-    });
-}
 
