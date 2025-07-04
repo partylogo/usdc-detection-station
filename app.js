@@ -225,44 +225,49 @@ const appData = {
 ],
     chains: [
     {
-        "chain": "Tron",
-        "amount": 80070,
-        "percentage": 50.3
-    },
-    {
         "chain": "Ethereum",
-        "amount": 64231,
-        "percentage": 40.3
-    },
-    {
-        "chain": "BSC",
-        "amount": 6282,
-        "percentage": 3.9
+        "amount": 38434,
+        "percentage": 62.1
     },
     {
         "chain": "Solana",
-        "amount": 2318,
-        "percentage": 1.5
+        "amount": 7512,
+        "percentage": 12.1
     },
     {
-        "chain": "Polygon",
-        "amount": 1056,
-        "percentage": 0.7
+        "chain": "Base",
+        "amount": 3757,
+        "percentage": 6.1
     },
     {
-        "chain": "Aptos",
-        "amount": 875,
-        "percentage": 0.5
+        "chain": "Hyperliquid L1",
+        "amount": 3532,
+        "percentage": 5.7
     },
     {
         "chain": "Arbitrum",
-        "amount": 857,
-        "percentage": 0.5
+        "amount": 2120,
+        "percentage": 3.4
     },
     {
-        "chain": "Others (84)",
-        "amount": 3615,
-        "percentage": 2.3
+        "chain": "Polygon",
+        "amount": 1018,
+        "percentage": 1.6
+    },
+    {
+        "chain": "BSC",
+        "amount": 990,
+        "percentage": 1.6
+    },
+    {
+        "chain": "Sui",
+        "amount": 835,
+        "percentage": 1.3
+    },
+    {
+        "chain": "Others (105)",
+        "amount": 3710,
+        "percentage": 6
     }
 ]
 };
