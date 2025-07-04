@@ -91,6 +91,8 @@ const errorTracker = {
 };
 
 // Cache management
+const CACHE_VERSION = 'v2'; // Increment this to invalidate all old caches
+
 const dataCache = {
     lastUpdate: null,
     data: null,
@@ -102,6 +104,7 @@ const dataCache = {
         this.data = data;
         this.lastUpdate = Date.now();
         localStorage.setItem('usdc_cache', JSON.stringify({
+            version: CACHE_VERSION,
             data: data,
             timestamp: this.lastUpdate
         }));
@@ -112,6 +115,12 @@ const dataCache = {
         const cached = localStorage.getItem('usdc_cache');
         if (cached) {
             const parsed = JSON.parse(cached);
+            // Check cache version
+            if (parsed.version !== CACHE_VERSION) {
+                localStorage.removeItem('usdc_cache');
+                console.log('Cache version mismatch, invalidating cache.');
+                return null;
+            }
             if (Date.now() - parsed.timestamp < apiConfig.cacheExpiry) {
                 this.data = parsed.data;
                 this.lastUpdate = parsed.timestamp;
