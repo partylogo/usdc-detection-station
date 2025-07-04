@@ -420,12 +420,19 @@ function enhanceStaticData(staticData) {
     const currentQuarter = Math.ceil(currentMonth / 3);
     
     // Update current data with time-aware information
-    enhanced.current.last_updated = now.toISOString().split('T')[0];
     enhanced.current.current_quarter = currentQuarter;
     enhanced.current.current_year = currentYear;
     
     // Extend monthly data to current month if needed
     enhanced.monthly = extendMonthlyData(enhanced.monthly, currentYear, currentMonth);
+
+    // Sync current supply with the latest from the (potentially extended) monthly data
+    if (enhanced.monthly.length > 0) {
+        const latestEntry = enhanced.monthly[enhanced.monthly.length - 1];
+        enhanced.current.total_supply = latestEntry.supply;
+        enhanced.current.market_cap = latestEntry.supply; // Keep market cap in sync
+        enhanced.current.last_updated = latestEntry.date; // Reflect the date of the latest data point
+    }
     
     // Update quarterly summary
     enhanced.current.growth_quarter = `Q${currentQuarter} ${currentYear}`;
@@ -571,45 +578,61 @@ function formatTimestamp(date) {
 
 // Update system time display
 function updateSystemTime() {
-    const now = new Date();
-    document.getElementById('systemTime').textContent = formatTimestamp(now);
+    const systemTimeEl = document.getElementById('systemTime');
+    if (systemTimeEl) {
+        systemTimeEl.textContent = new Date().toLocaleString();
+    }
 }
 
 // Update dashboard data
 function updateDashboardData(data) {
-    // Update current supply
-    document.getElementById('totalSupply').textContent = formatNumber(data.current.total_supply);
-    document.getElementById('marketCap').textContent = `$${formatNumber(data.current.market_cap)}M`;
+    document.getElementById('totalSupply').textContent = formatNumber(Math.round(data.current.total_supply));
+    document.getElementById('marketCap').textContent = `$${formatNumber(Math.round(data.current.market_cap))}M`;
+    document.getElementById('lastUpdated').textContent = formatTimestamp(new Date(data.current.last_updated));
     
-    // Update quarterly summary dynamically
+    // Update quarterly summary
     updateQuarterlySummary(data);
 }
 
-// Update quarterly summary with current quarter info
 function updateQuarterlySummary(data) {
-    const now = new Date();
-    const currentQuarter = Math.ceil((now.getMonth() + 1) / 3);
-    const currentYear = now.getFullYear();
-    
-    // Find current year data
-    const currentYearData = data.yearly.find(y => y.year === currentYear);
-    const previousYearData = data.yearly.find(y => y.year === currentYear - 1);
-    
-    if (currentYearData && previousYearData) {
-        const growth = currentYearData.supply - previousYearData.supply;
-        const growthPercentage = ((growth / previousYearData.supply) * 100).toFixed(1);
+    const quarterlyGrowthLabel = document.querySelector('.supply-stats .stat-item:first-child .stat-label');
+    const quarterlyGrowthValue = document.querySelector('.supply-stats .stat-item:first-child .stat-value');
+
+    if (quarterlyGrowthLabel && quarterlyGrowthValue) {
+        const now = new Date();
+        const year = now.getFullYear();
+        const quarter = Math.floor(now.getMonth() / 3) + 1;
+
+        // Format the label
+        quarterlyGrowthLabel.innerHTML = `Q${quarter} ${year} 增長 | Q${quarter} ${year} Growth`;
+
+        // Always calculate growth based on previous quarter's data for consistency
+        const previousQuarterEndMonth = quarter * 3 - 3;
         
-        // Update the quarterly summary text
-        const statElement = document.querySelector('.stat-item .stat-label');
-        const statValueElement = document.querySelector('.stat-item .stat-value');
-        
-        if (statElement && statValueElement) {
-            statElement.textContent = `Q${currentQuarter} ${currentYear} 增長 | Q${currentQuarter} ${currentYear} Growth`;
+        // Find supply at the end of the previous quarter
+        const previousData = data.monthly
+            .filter(d => d.year < year || (d.year === year && d.month <= previousQuarterEndMonth))
+            .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+
+        let growthAmount = 0;
+        let growthPercentage = 'N/A';
+
+        if (previousData) {
+            const previousQuarterSupply = previousData.supply;
+            growthAmount = data.current.total_supply - previousQuarterSupply;
             
-            const isPositive = growth >= 0;
-            statValueElement.textContent = `${isPositive ? '+' : ''}$${formatNumber(Math.abs(growth))}M (${isPositive ? '+' : ''}${growthPercentage}%)`;
-            statValueElement.className = `stat-value ${isPositive ? 'positive' : 'negative'}`;
+            if (previousQuarterSupply > 0) {
+                const percentage = ((growthAmount / previousQuarterSupply) * 100);
+                growthPercentage = `${percentage >= 0 ? '+' : ''}${percentage.toFixed(1)}%`;
+            }
         }
+        
+        // Format the value
+        const formattedGrowth = growthAmount > 0 ? `+$${formatNumber(Math.round(growthAmount))}M` : `-$${formatNumber(Math.abs(Math.round(growthAmount)))}M`;
+        const colorClass = growthAmount >= 0 ? 'positive' : 'negative';
+
+        quarterlyGrowthValue.innerHTML = `${formattedGrowth} (${growthPercentage})`;
+        quarterlyGrowthValue.className = `stat-value ${colorClass}`;
     }
 }
 
