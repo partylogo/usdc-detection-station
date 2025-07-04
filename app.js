@@ -125,60 +125,146 @@ const dataCache = {
 // Application data
 const appData = {
     current: {
-        total_supply: 61690,
-        market_cap: 61690,
-        last_updated: "2025-06-24",
-        growth_q1_2025: 16119,
-        growth_percentage: "36.8%"
+        total_supply: 62164,
+        market_cap: 62164,
+        price: 1.00,
+        fdv: 62164,
+        last_updated: "2025-07-04"
     },
     monthly: [
-        {"date": "2022-12", "supply": 44554, "year": 2022, "month": 12},
-        {"date": "2023-01", "supply": 41369, "year": 2023, "month": 1},
-        {"date": "2023-02", "supply": 38184, "year": 2023, "month": 2},
-        {"date": "2023-03", "supply": 35000, "year": 2023, "month": 3},
-        {"date": "2023-04", "supply": 33333, "year": 2023, "month": 4},
-        {"date": "2023-05", "supply": 31667, "year": 2023, "month": 5},
-        {"date": "2023-06", "supply": 30000, "year": 2023, "month": 6},
-        {"date": "2023-07", "supply": 29000, "year": 2023, "month": 7},
-        {"date": "2023-08", "supply": 28000, "year": 2023, "month": 8},
-        {"date": "2023-09", "supply": 27000, "year": 2023, "month": 9},
-        {"date": "2023-10", "supply": 26141, "year": 2023, "month": 10},
-        {"date": "2023-11", "supply": 25276, "year": 2023, "month": 11},
-        {"date": "2023-12", "supply": 24412, "year": 2023, "month": 12},
-        {"date": "2024-01", "supply": 27081, "year": 2024, "month": 1},
-        {"date": "2024-02", "supply": 29750, "year": 2024, "month": 2},
-        {"date": "2024-03", "supply": 32419, "year": 2024, "month": 3},
-        {"date": "2024-04", "supply": 33280, "year": 2024, "month": 4},
-        {"date": "2024-05", "supply": 34140, "year": 2024, "month": 5},
-        {"date": "2024-06", "supply": 35000, "year": 2024, "month": 6},
-        {"date": "2024-07", "supply": 36333, "year": 2024, "month": 7},
-        {"date": "2024-08", "supply": 37667, "year": 2024, "month": 8},
-        {"date": "2024-09", "supply": 39000, "year": 2024, "month": 9},
-        {"date": "2024-10", "supply": 40619, "year": 2024, "month": 10},
-        {"date": "2024-11", "supply": 42238, "year": 2024, "month": 11},
-        {"date": "2024-12", "supply": 43857, "year": 2024, "month": 12},
-        {"date": "2025-01", "supply": 49230, "year": 2025, "month": 1},
-        {"date": "2025-02", "supply": 54603, "year": 2025, "month": 2},
-        {"date": "2025-03", "supply": 59976, "year": 2025, "month": 3},
-        {"date": "2025-04", "supply": 60547, "year": 2025, "month": 4},
-        {"date": "2025-05", "supply": 61119, "year": 2025, "month": 5},
-        {"date": "2025-06", "supply": 61690, "year": 2025, "month": 6}
-    ],
+    {
+        "date": "2024-07",
+        "supply": 33471,
+        "year": 2024,
+        "month": 7
+    },
+    {
+        "date": "2024-08",
+        "supply": 34748,
+        "year": 2024,
+        "month": 8
+    },
+    {
+        "date": "2024-09",
+        "supply": 36242,
+        "year": 2024,
+        "month": 9
+    },
+    {
+        "date": "2024-10",
+        "supply": 35044,
+        "year": 2024,
+        "month": 10
+    },
+    {
+        "date": "2024-11",
+        "supply": 39807,
+        "year": 2024,
+        "month": 11
+    },
+    {
+        "date": "2024-12",
+        "supply": 43803,
+        "year": 2024,
+        "month": 12
+    },
+    {
+        "date": "2025-01",
+        "supply": 53108,
+        "year": 2025,
+        "month": 1
+    },
+    {
+        "date": "2025-02",
+        "supply": 55583,
+        "year": 2025,
+        "month": 2
+    },
+    {
+        "date": "2025-03",
+        "supply": 60188,
+        "year": 2025,
+        "month": 3
+    },
+    {
+        "date": "2025-04",
+        "supply": 62143,
+        "year": 2025,
+        "month": 4
+    },
+    {
+        "date": "2025-05",
+        "supply": 61040,
+        "year": 2025,
+        "month": 5
+    },
+    {
+        "date": "2025-06",
+        "supply": 61672,
+        "year": 2025,
+        "month": 6
+    },
+    {
+        "date": "2025-07",
+        "supply": 62164,
+        "year": 2025,
+        "month": 7
+    }
+],
     yearly: [
-        {"year": 2022, "supply": 44554, "change": 2138},
-        {"year": 2023, "supply": 24412, "change": -20142},
-        {"year": 2024, "supply": 43857, "change": 19445},
-        {"year": 2025, "supply": 59976, "change": 16119}
-    ],
+    {
+        "year": 2024,
+        "supply": 43803,
+        "change": 0
+    },
+    {
+        "year": 2025,
+        "supply": 62164,
+        "change": 18361
+    }
+],
     chains: [
-        {"chain": "Ethereum", "amount": 39880, "percentage": 61},
-        {"chain": "Solana", "amount": 9730, "percentage": 16},
-        {"chain": "Base", "amount": 3750, "percentage": 6},
-        {"chain": "Arbitrum", "amount": 3740, "percentage": 6},
-        {"chain": "Polygon", "amount": 2000, "percentage": 3},
-        {"chain": "Avalanche", "amount": 1500, "percentage": 2},
-        {"chain": "Others", "amount": 1090, "percentage": 2}
-    ]
+    {
+        "chain": "Tron",
+        "amount": 80070,
+        "percentage": 50.3
+    },
+    {
+        "chain": "Ethereum",
+        "amount": 64231,
+        "percentage": 40.3
+    },
+    {
+        "chain": "BSC",
+        "amount": 6282,
+        "percentage": 3.9
+    },
+    {
+        "chain": "Solana",
+        "amount": 2318,
+        "percentage": 1.5
+    },
+    {
+        "chain": "Polygon",
+        "amount": 1056,
+        "percentage": 0.7
+    },
+    {
+        "chain": "Aptos",
+        "amount": 875,
+        "percentage": 0.5
+    },
+    {
+        "chain": "Arbitrum",
+        "amount": 857,
+        "percentage": 0.5
+    },
+    {
+        "chain": "Others (84)",
+        "amount": 3615,
+        "percentage": 2.3
+    }
+]
 };
 
 // Initialize the application
@@ -293,11 +379,15 @@ async function loadRealTimeData() {
             return cachedData;
         }
 
-        console.log('Fetching fresh data from API...');
-        const usdcData = await fetchUSDCData();
+        console.log('Fetching fresh data from APIs...');
+        // Fetch both data points in parallel
+        const [usdcData, chainData] = await Promise.all([
+            fetchUSDCData(),
+            fetchChainDistributionData()
+        ]);
         
-        if (usdcData) {
-            const enhancedData = await enhanceWithRealData(usdcData);
+        if (usdcData) { // We need at least the main USDC data
+            const enhancedData = await enhanceWithRealData(usdcData, chainData);
             dataCache.set(enhancedData);
             return enhancedData;
         }
@@ -344,6 +434,29 @@ async function fetchUSDCData() {
     // All sources failed
     errorTracker.recordFailure(lastError);
     throw new Error(`All API sources failed. Last error: ${lastError?.message}`);
+}
+
+async function fetchChainDistributionData() {
+    try {
+        console.log('Fetching chain distribution data from DefiLlama...');
+        const response = await fetch('https://stablecoins.llama.fi/stablecoins');
+        if (!response.ok) {
+            throw new Error(`DefiLlama API failed with status: ${response.status}`);
+        }
+        const data = await response.json();
+        const usdcData = data.peggedAssets.find(asset => asset.id === "1");
+        
+        if (!usdcData || !usdcData.chainCirculating) {
+            throw new Error('USDC data or chain distribution not found in DefiLlama response');
+        }
+        
+        console.log('Successfully fetched chain distribution data.');
+        return usdcData.chainCirculating;
+
+    } catch (error) {
+        console.error('Failed to fetch chain distribution data:', error);
+        return null; // Return null instead of throwing, so the app can continue with static data.
+    }
 }
 
 // Fetch data from a specific source with retry logic
@@ -443,19 +556,22 @@ function enhanceStaticData(staticData) {
     enhanced.current.current_quarter = currentQuarter;
     enhanced.current.current_year = currentYear;
     
-    // Extend monthly data to current month if needed
-    enhanced.monthly = extendMonthlyData(enhanced.monthly, currentYear, currentMonth);
+    // Don't extend monthly data - only use real historical data
+    // enhanced.monthly = extendMonthlyData(enhanced.monthly, currentYear, currentMonth);
 
-    // Sync current supply with the latest from the (potentially extended) monthly data
-    if (enhanced.monthly.length > 0) {
-        const latestEntry = enhanced.monthly[enhanced.monthly.length - 1];
-        enhanced.current.total_supply = latestEntry.supply;
-        enhanced.current.market_cap = latestEntry.supply; // Keep market cap in sync
-        enhanced.current.last_updated = latestEntry.date; // Reflect the date of the latest data point
-    }
+    // Don't auto-sync with fake data - only update when we have real API data
+    // if (enhanced.monthly.length > 0) {
+    //     const latestEntry = enhanced.monthly[enhanced.monthly.length - 1];
+    //     enhanced.current.total_supply = latestEntry.supply;
+    //     enhanced.current.market_cap = latestEntry.supply;
+    //     enhanced.current.last_updated = latestEntry.date;
+    // }
     
     // Update quarterly summary
     enhanced.current.growth_quarter = `Q${currentQuarter} ${currentYear}`;
+
+    // Also calculate yearly summary for static data to ensure consistency
+    enhanced.yearly = calculateYearlySummary(enhanced.monthly);
     
     return enhanced;
 }
@@ -469,14 +585,19 @@ function extendMonthlyData(monthlyData, currentYear, currentMonth) {
 }
 
 // Enhance static data with real API data
-async function enhanceWithRealData(apiData) {
+async function enhanceWithRealData(apiData, chainData) {
     // Start with a clean copy of the static data.
     const enhanced = JSON.parse(JSON.stringify(appData));
     
     try {
+        console.log('API Data received:', apiData);
+        
         // Extract real data from API response
-        if (apiData.marketCap && apiData.totalSupply) {
-            const realSupply = Math.round(apiData.marketCap / 1000000); // API market cap is the source of truth
+        if (apiData && apiData.marketCap && apiData.totalSupply) {
+            console.log('Processing real API data...');
+            // Preserve precision - convert to millions with decimals instead of rounding to integers
+            const realSupply = Math.round(apiData.marketCap / 1000000 * 100) / 100; // Keep 2 decimal places
+            console.log('Real supply calculated:', realSupply);
 
             // Update the main 'current' metrics
             enhanced.current.total_supply = realSupply;
@@ -491,11 +612,13 @@ async function enhanceWithRealData(apiData) {
             
             const lastEntry = enhanced.monthly[enhanced.monthly.length - 1];
 
-            if (lastEntry.date === currentDateLabel) {
+            if (lastEntry && lastEntry.date === currentDateLabel) {
                 // If an entry for the current month already exists, update its supply
+                console.log('Updating existing monthly entry for', currentDateLabel);
                 lastEntry.supply = realSupply;
             } else {
                 // Otherwise, add a new data point for the current month
+                console.log('Adding new monthly entry for', currentDateLabel);
                 enhanced.monthly.push({
                     date: currentDateLabel,
                     supply: realSupply,
@@ -524,16 +647,105 @@ async function enhanceWithRealData(apiData) {
                     });
                 }
             }
+            
+            // Dynamically update chain distribution if we have the data
+            if (chainData) {
+                console.log('Processing real chain distribution data...');
+                const transformedChains = [];
+                let totalChainSupply = 0;
+
+                // First, calculate the total supply from all chains
+                for (const chainName in chainData) {
+                    const chain = chainData[chainName];
+                    if (chain && chain.current && typeof chain.current.peggedUSD === 'number') {
+                        totalChainSupply += chain.current.peggedUSD;
+                    }
+                }
+                
+                // If total is zero, something is wrong, fallback to static
+                if (totalChainSupply === 0) {
+                     console.warn("Total supply from DefiLlama is zero, falling back to static chain data.");
+                     enhanced.chains = appData.chains; // fallback
+                } else {
+                    let othersAmount = 0;
+                    let othersCount = 0;
+                    
+                    const sortedChains = Object.entries(chainData).sort(([,a],[,b]) => b.current.peggedUSD - a.current.peggedUSD);
+
+                    // Process top chains and group the rest into "Others"
+                    sortedChains.forEach(([chainName, chain], index) => {
+                         if (chain && chain.current && typeof chain.current.peggedUSD === 'number') {
+                             const amountInMillions = chain.current.peggedUSD / 1000000;
+                             // Group chains with less than 0.5% into "Others", but always show top 6
+                             if (index >= 6 && (amountInMillions / (totalChainSupply/1000000)) < 0.005) {
+                                 othersAmount += amountInMillions;
+                                 othersCount++;
+                             } else {
+                                 transformedChains.push({
+                                     chain: chainName,
+                                     amount: Math.round(amountInMillions),
+                                     percentage: parseFloat(((amountInMillions / (totalChainSupply / 1000000)) * 100).toFixed(1))
+                                 });
+                             }
+                         }
+                    });
+
+                    if (othersCount > 0) {
+                        transformedChains.push({
+                            chain: `Others (${othersCount})`,
+                            amount: Math.round(othersAmount),
+                            percentage: parseFloat(((othersAmount / (totalChainSupply / 1000000)) * 100).toFixed(1))
+                        });
+                    }
+
+                    enhanced.chains = transformedChains;
+                }
+            }
+
+            // Dynamically recalculate yearly summary from the updated monthly data
+            enhanced.yearly = calculateYearlySummary(enhanced.monthly);
+            
+            console.log('Data enhanced with real API data successfully');
+            return enhanced;
+        } else {
+            console.log('No valid API data received, using static data');
+            return enhanceStaticData(appData);
         }
-        
-        console.log('Data enhanced with real API data');
-        return enhanced;
         
     } catch (error) {
         console.error('Error enhancing data with API response:', error);
         // If enhancing fails, return the un-enhanced static data.
         return enhanceStaticData(appData); 
     }
+}
+
+function calculateYearlySummary(monthlyData) {
+    const yearlySummary = {};
+
+    monthlyData.forEach(item => {
+        if (!yearlySummary[item.year]) {
+            yearlySummary[item.year] = {
+                year: item.year,
+                supply: 0,
+                // We'll calculate change later
+            };
+        }
+        // Use the latest supply for that year
+        yearlySummary[item.year].supply = item.supply;
+    });
+
+    const result = Object.values(yearlySummary);
+
+    // Calculate year-over-year change
+    for (let i = 0; i < result.length; i++) {
+        if (i > 0) {
+            result[i].change = result[i].supply - result[i-1].supply;
+        } else {
+            result[i].change = 0; // No previous year for the first entry
+        }
+    }
+
+    return result;
 }
 
 // Format a number with commas
@@ -593,8 +805,12 @@ function updateSystemTime() {
 
 // Update dashboard data
 function updateDashboardData(data) {
-    document.getElementById('totalSupply').textContent = formatNumber(Math.round(data.current.total_supply));
-    document.getElementById('marketCap').textContent = `$${formatNumber(Math.round(data.current.market_cap))}M`;
+    // Convert from millions to hundreds of millions (億)
+    const totalSupplyInHundredMillion = (data.current.total_supply / 100).toFixed(1);
+    const marketCapInHundredMillion = (data.current.market_cap / 100).toFixed(1);
+    
+    document.getElementById('totalSupply').textContent = totalSupplyInHundredMillion;
+    document.getElementById('marketCap').textContent = `$${marketCapInHundredMillion}億`;
     document.getElementById('lastUpdated').textContent = formatTimestamp(new Date(data.current.last_updated));
     
     // Update quarterly summary
@@ -634,8 +850,9 @@ function updateQuarterlySummary(data) {
             }
         }
         
-        // Format the value
-        const formattedGrowth = growthAmount > 0 ? `+$${formatNumber(Math.round(growthAmount))}M` : `-$${formatNumber(Math.abs(Math.round(growthAmount)))}M`;
+        // Format the value - convert to hundreds of millions (億)
+        const growthInHundredMillion = (Math.abs(growthAmount) / 100).toFixed(1);
+        const formattedGrowth = growthAmount >= 0 ? `+$${growthInHundredMillion}億` : `-$${growthInHundredMillion}億`;
         const colorClass = growthAmount >= 0 ? 'positive' : 'negative';
 
         quarterlyGrowthValue.innerHTML = `${formattedGrowth} (${growthPercentage})`;
@@ -669,7 +886,7 @@ function createMonthlyChart(data) {
             datasets: [
                 {
                     label: 'USDC 供應量 | USDC Supply',
-                    data: supplyData,
+                    data: supplyData.map(value => value / 100), // Convert to hundreds of millions
                     borderColor: '#2775CA',
                     backgroundColor: 'rgba(39, 117, 202, 0.1)',
                     borderWidth: 3,
@@ -727,19 +944,19 @@ function createMonthlyChart(data) {
                             if (datasetLabel.includes('Growth')) {
                                 return `${datasetLabel}: ${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
                             } else {
-                                return `${datasetLabel}: $${formatNumber(value)}M`;
+                                return `${datasetLabel}: $${value.toFixed(1)}億`;
                             }
                         },
                         afterBody: function(context) {
                             const dataIndex = context[0].dataIndex;
                             if (dataIndex > 0) {
-                                const current = supplyData[dataIndex];
-                                const previous = supplyData[dataIndex - 1];
+                                const current = supplyData[dataIndex] / 100; // Convert to hundreds of millions
+                                const previous = supplyData[dataIndex - 1] / 100; // Convert to hundreds of millions
                                 const change = current - previous;
                                 const changePercent = ((change / previous) * 100).toFixed(1);
                                 return [
                                     '',
-                                    `月變化: ${change >= 0 ? '+' : ''}$${formatNumber(Math.abs(change))}M`,
+                                    `月變化: ${change >= 0 ? '+' : ''}$${Math.abs(change).toFixed(1)}億`,
                                     `變化率: ${change >= 0 ? '+' : ''}${changePercent}%`
                                 ];
                             }
@@ -771,7 +988,7 @@ function createMonthlyChart(data) {
                     },
                     ticks: {
                         callback: function(value) {
-                            return '$' + formatNumber(value) + 'M';
+                            return '$' + value.toFixed(1) + '億';
                         },
                         font: {
                             size: 10
@@ -827,8 +1044,8 @@ function createYearlyChart(data) {
         data: {
             labels: labels,
             datasets: [{
-                label: 'USDC 年度供應量（百萬美元） | USDC Annual Supply (Million USD)',
-                data: supplyData,
+                label: 'USDC 年度供應量（億美元） | USDC Annual Supply (Hundred Million USD)',
+                data: supplyData.map(value => value / 100), // Convert to hundreds of millions
                 backgroundColor: backgroundColors,
                 borderColor: backgroundColors.map(color => color.replace('0.7', '1')),
                 borderWidth: 1,
@@ -855,11 +1072,11 @@ function createYearlyChart(data) {
                     callbacks: {
                         label: function(context) {
                             const index = context.dataIndex;
-                            const change = changeData[index];
+                            const change = changeData[index] / 100; // Convert to hundreds of millions
                             const sign = change >= 0 ? '+' : '';
                             return [
-                                `供應量 | Supply: $${formatNumber(context.raw)}M`,
-                                `年度變化 | Change: ${sign}$${formatNumber(change)}M`
+                                `供應量 | Supply: $${context.raw.toFixed(1)}億`,
+                                `年度變化 | Change: ${sign}$${Math.abs(change).toFixed(1)}億`
                             ];
                         }
                     }
@@ -878,7 +1095,7 @@ function createYearlyChart(data) {
                     },
                     ticks: {
                         callback: function(value) {
-                            return '$' + formatNumber(value) + 'M';
+                            return '$' + value.toFixed(1) + '億';
                         }
                     }
                 }
@@ -954,9 +1171,9 @@ function createChainChart(data) {
                     callbacks: {
                         label: function(context) {
                             const label = context.label;
-                            const value = context.raw;
+                            const value = context.raw / 100; // Convert to hundreds of millions
                             const percentage = context.chart.data.datasets[0].data[context.dataIndex] / context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0) * 100;
-                            return `${label}: $${formatNumber(value)}M (${percentage.toFixed(1)}%)`;
+                            return `${label}: $${value.toFixed(1)}億 (${percentage.toFixed(1)}%)`;
                         }
                     }
                 }
@@ -983,7 +1200,7 @@ function populateChainTable(data) {
                 <div class="chain-name">${item.chain}</div>
             </div>
             <div class="chain-stats">
-                <div class="chain-amount">$${formatNumber(item.amount)}M</div>
+                <div class="chain-amount">$${(item.amount / 100).toFixed(1)}億</div>
                 <div class="chain-percentage">${item.percentage}%</div>
             </div>
         `;

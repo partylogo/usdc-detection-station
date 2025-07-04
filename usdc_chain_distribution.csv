@@ -1,8 +1,9 @@
 chain,amount,percentage
-Ethereum,39880,61
-Solana,9730,16
-Base,3750,6
-Arbitrum,3740,6
-Polygon,2000,3
-Avalanche,1500,2
-Others,1090,2
+Tron,80070,50.3
+Ethereum,64231,40.3
+BSC,6282,3.9
+Solana,2318,1.5
+Polygon,1056,0.7
+Aptos,875,0.5
+Arbitrum,857,0.5
+Others (84),3615,2.3
