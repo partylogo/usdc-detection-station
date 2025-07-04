@@ -462,90 +462,77 @@ function enhanceStaticData(staticData) {
 
 // Extend monthly data array to include current month
 function extendMonthlyData(monthlyData, currentYear, currentMonth) {
-    const extended = [...monthlyData];
-    const lastEntry = extended[extended.length - 1];
-    
-    if (!lastEntry) return extended;
-    
-    const lastYear = lastEntry.year;
-    const lastMonth = lastEntry.month;
-    
-    // If current month is ahead, interpolate data
-    if (currentYear > lastYear || (currentYear === lastYear && currentMonth > lastMonth)) {
-        let nextYear = lastYear;
-        let nextMonth = lastMonth + 1;
-        
-        while (nextYear < currentYear || (nextYear === currentYear && nextMonth <= currentMonth)) {
-            if (nextMonth > 12) {
-                nextMonth = 1;
-                nextYear++;
-            }
-            
-            // Simple interpolation - in reality, this would be replaced by real data
-            const interpolatedSupply = Math.round(lastEntry.supply * (1 + Math.random() * 0.1 - 0.05));
-            
-            extended.push({
-                date: `${nextYear}-${nextMonth.toString().padStart(2, '0')}`,
-                supply: interpolatedSupply,
-                year: nextYear,
-                month: nextMonth
-            });
-            
-            nextMonth++;
-            
-            // Prevent infinite loops
-            if (extended.length > monthlyData.length + 24) break;
-        }
-    }
-    
-    return extended;
+    // This function's logic for faking data is deprecated.
+    // Real-time data is now added in enhanceWithRealData.
+    // Returning the original data unmodified to prevent rendering "guessed" points.
+    return [...monthlyData];
 }
 
 // Enhance static data with real API data
 async function enhanceWithRealData(apiData) {
-    const enhanced = enhanceStaticData(appData);
+    // Start with a clean copy of the static data.
+    const enhanced = JSON.parse(JSON.stringify(appData));
     
     try {
         // Extract real data from API response
-        if (apiData.market_data) {
-            const marketCap = apiData.market_data.market_cap?.usd;
-            const totalSupply = apiData.market_data.total_supply;
-            const currentPrice = apiData.market_data.current_price?.usd;
+        if (apiData.marketCap && apiData.totalSupply) {
+            const realSupply = Math.round(apiData.marketCap / 1000000); // API market cap is the source of truth
+
+            // Update the main 'current' metrics
+            enhanced.current.total_supply = realSupply;
+            enhanced.current.market_cap = realSupply;
+            enhanced.current.last_updated = apiData.lastUpdated || new Date().toISOString();
+
+            // Intelligently add/update the monthly data point for the current month
+            const now = new Date(enhanced.current.last_updated);
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1;
+            const currentDateLabel = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
             
-            if (marketCap && totalSupply) {
-                // Update current supply (convert from market cap if needed)
-                enhanced.current.total_supply = Math.round(marketCap / 1000000); // Convert to millions
-                enhanced.current.market_cap = enhanced.current.total_supply;
-                
-                // Update the latest monthly entry
-                if (enhanced.monthly.length > 0) {
-                    enhanced.monthly[enhanced.monthly.length - 1].supply = enhanced.current.total_supply;
-                }
-                
-                // Update the latest yearly entry
-                if (enhanced.yearly.length > 0) {
-                    const currentYear = new Date().getFullYear();
-                    const yearlyEntry = enhanced.yearly.find(y => y.year === currentYear);
-                    if (yearlyEntry) {
-                        const previousYear = enhanced.yearly.find(y => y.year === currentYear - 1);
-                        yearlyEntry.supply = enhanced.current.total_supply;
-                        if (previousYear) {
-                            yearlyEntry.change = yearlyEntry.supply - previousYear.supply;
-                        }
+            const lastEntry = enhanced.monthly[enhanced.monthly.length - 1];
+
+            if (lastEntry.date === currentDateLabel) {
+                // If an entry for the current month already exists, update its supply
+                lastEntry.supply = realSupply;
+            } else {
+                // Otherwise, add a new data point for the current month
+                enhanced.monthly.push({
+                    date: currentDateLabel,
+                    supply: realSupply,
+                    year: currentYear,
+                    month: currentMonth
+                });
+            }
+
+            // Update the latest yearly entry
+            if (enhanced.yearly.length > 0) {
+                const yearlyEntry = enhanced.yearly.find(y => y.year === currentYear);
+                const previousYear = enhanced.yearly.find(y => y.year === currentYear - 1);
+
+                if (yearlyEntry) {
+                    yearlyEntry.supply = realSupply;
+                    if (previousYear) {
+                        yearlyEntry.change = yearlyEntry.supply - previousYear.supply;
                     }
+                } else {
+                    // If no entry for current year, add one
+                    const lastYearSupply = previousYear ? previousYear.supply : 0;
+                    enhanced.yearly.push({
+                        year: currentYear,
+                        supply: realSupply,
+                        change: realSupply - lastYearSupply
+                    });
                 }
             }
         }
-        
-        // Update timestamp
-        enhanced.current.last_updated = new Date().toISOString().split('T')[0];
         
         console.log('Data enhanced with real API data');
         return enhanced;
         
     } catch (error) {
         console.error('Error enhancing data with API response:', error);
-        return enhanced;
+        // If enhancing fails, return the un-enhanced static data.
+        return enhanceStaticData(appData); 
     }
 }
 
@@ -660,9 +647,12 @@ function updateQuarterlySummary(data) {
 function createMonthlyChart(data) {
     const ctx = document.getElementById('monthlyChart').getContext('2d');
     
+    // Limit data to the last 16 months
+    const chartData = data.slice(-16);
+
     // Prepare data
-    const labels = data.map(item => item.date);
-    const supplyData = data.map(item => item.supply);
+    const labels = chartData.map(item => item.date);
+    const supplyData = chartData.map(item => item.supply);
     
     // Calculate growth rate
     const growthRate = calculateGrowthRate(supplyData);
@@ -684,8 +674,8 @@ function createMonthlyChart(data) {
                     backgroundColor: 'rgba(39, 117, 202, 0.1)',
                     borderWidth: 3,
                     pointBackgroundColor: '#2775CA',
-                    pointRadius: 6,
-                    pointHoverRadius: 8,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
                     tension: 0.2,
                     fill: true,
                     yAxisID: 'y'
@@ -1172,67 +1162,6 @@ function showNotification(message, type = 'info') {
     setTimeout(() => {
         notification.style.opacity = '0';
     }, 3000);
-}
-
-// Simulate data updates with small variations
-function simulateDataUpdate(originalData) {
-    const clone = JSON.parse(JSON.stringify(originalData));
-    
-    // Small random variation function
-    const variation = (base, percent = 2) => {
-        const change = base * (Math.random() * percent / 100) * (Math.random() > 0.5 ? 1 : -1);
-        return Math.round(base + change);
-    };
-    
-    // Update current supply with a small variation
-    clone.current.total_supply = variation(clone.current.total_supply, 1);
-    clone.current.market_cap = clone.current.total_supply;
-    
-    // Update last month's supply
-    if (clone.monthly.length > 0) {
-        const lastIndex = clone.monthly.length - 1;
-        clone.monthly[lastIndex].supply = clone.current.total_supply;
-    }
-    
-    // Update current year's supply
-    if (clone.yearly.length > 0) {
-        const lastIndex = clone.yearly.length - 1;
-        clone.yearly[lastIndex].supply = clone.current.total_supply;
-        
-        // Recalculate change
-        if (lastIndex > 0) {
-            clone.yearly[lastIndex].change = clone.yearly[lastIndex].supply - clone.yearly[lastIndex - 1].supply;
-        }
-    }
-    
-    // Update chain distributions proportionally
-    const totalSupply = clone.current.total_supply;
-    let remainingPercentage = 100;
-    let remainingAmount = totalSupply;
-    
-    // Update all chains except the last one
-    for (let i = 0; i < clone.chains.length - 1; i++) {
-        // Slight variation in percentage
-        let newPercentage = Math.max(1, Math.round(clone.chains[i].percentage + (Math.random() > 0.5 ? 1 : -1) * (Math.random() < 0.7 ? 0 : 1)));
-        
-        // Ensure we don't exceed the total
-        if (newPercentage > remainingPercentage - (clone.chains.length - i - 1)) {
-            newPercentage = remainingPercentage - (clone.chains.length - i - 1);
-        }
-        
-        clone.chains[i].percentage = newPercentage;
-        clone.chains[i].amount = Math.round(totalSupply * newPercentage / 100);
-        
-        remainingPercentage -= newPercentage;
-        remainingAmount -= clone.chains[i].amount;
-    }
-    
-    // Last chain gets the remainder
-    const lastIndex = clone.chains.length - 1;
-    clone.chains[lastIndex].percentage = remainingPercentage;
-    clone.chains[lastIndex].amount = Math.max(0, remainingAmount);
-    
-    return clone;
 }
 
 // Update growth metrics in supply overview
