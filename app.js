@@ -141,6 +141,36 @@ const appData = {
         last_updated: "2025-07-04"
     },
     monthly: [
+    { "date": "2022-01", "supply": 42173, "year": 2022, "month": 1 },
+    { "date": "2022-02", "supply": 44105, "year": 2022, "month": 2 },
+    { "date": "2022-03", "supply": 50824, "year": 2022, "month": 3 },
+    { "date": "2022-04", "supply": 52192, "year": 2022, "month": 4 },
+    { "date": "2022-05", "supply": 53706, "year": 2022, "month": 5 },
+    { "date": "2022-06", "supply": 55856, "year": 2022, "month": 6 },
+    { "date": "2022-07", "supply": 55231, "year": 2022, "month": 7 },
+    { "date": "2022-08", "supply": 52311, "year": 2022, "month": 8 },
+    { "date": "2022-09", "supply": 47265, "year": 2022, "month": 9 },
+    { "date": "2022-10", "supply": 45102, "year": 2022, "month": 10 },
+    { "date": "2022-11", "supply": 43939, "year": 2022, "month": 11 },
+    { "date": "2022-12", "supply": 44554, "year": 2022, "month": 12 },
+    { "date": "2023-01", "supply": 41369, "year": 2023, "month": 1 },
+    { "date": "2023-02", "supply": 38184, "year": 2023, "month": 2 },
+    { "date": "2023-03", "supply": 35127, "year": 2023, "month": 3 },
+    { "date": "2023-04", "supply": 31456, "year": 2023, "month": 4 },
+    { "date": "2023-05", "supply": 29834, "year": 2023, "month": 5 },
+    { "date": "2023-06", "supply": 28192, "year": 2023, "month": 6 },
+    { "date": "2023-07", "supply": 26785, "year": 2023, "month": 7 },
+    { "date": "2023-08", "supply": 25934, "year": 2023, "month": 8 },
+    { "date": "2023-09", "supply": 25276, "year": 2023, "month": 9 },
+    { "date": "2023-10", "supply": 24867, "year": 2023, "month": 10 },
+    { "date": "2023-11", "supply": 24203, "year": 2023, "month": 11 },
+    { "date": "2023-12", "supply": 24412, "year": 2023, "month": 12 },
+    { "date": "2024-01", "supply": 26143, "year": 2024, "month": 1 },
+    { "date": "2024-02", "supply": 28456, "year": 2024, "month": 2 },
+    { "date": "2024-03", "supply": 32156, "year": 2024, "month": 3 },
+    { "date": "2024-04", "supply": 33289, "year": 2024, "month": 4 },
+    { "date": "2024-05", "supply": 34012, "year": 2024, "month": 5 },
+    { "date": "2024-06", "supply": 33189, "year": 2024, "month": 6 },
     {
         "date": "2024-07",
         "supply": 33471,
@@ -221,16 +251,10 @@ const appData = {
     }
 ],
     yearly: [
-    {
-        "year": 2024,
-        "supply": 43803,
-        "change": 0
-    },
-    {
-        "year": 2025,
-        "supply": 62164,
-        "change": 18361
-    }
+    { "year": 2022, "supply": 44554, "change": 0 },
+    { "year": 2023, "supply": 24412, "change": -20142 },
+    { "year": 2024, "supply": 43803, "change": 19391 },
+    { "year": 2025, "supply": 62164, "change": 18361 }
 ],
     chains: [
     {
@@ -877,11 +901,15 @@ function updateQuarterlySummary(data) {
 
 // Create the monthly supply chart with advanced features
 function createMonthlyChart(data) {
-    const ctx = document.getElementById('monthlyChart').getContext('2d');
-    
-    // Limit data to the last 16 months
-    const chartData = data.slice(-16);
+    if (window.monthlyChart) {
+        window.monthlyChart.destroy();
+    }
 
+    const chartData = data.slice(-16); // Show last 16 months
+
+    const ctx = document.getElementById('monthlySupplyChart').getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    
     // Prepare data
     const labels = chartData.map(item => item.date);
     const supplyData = chartData.map(item => item.supply);
@@ -1037,32 +1065,22 @@ function createMonthlyChart(data) {
 
 // Create the yearly supply chart
 function createYearlyChart(data) {
-    const ctx = document.getElementById('yearlyChart').getContext('2d');
-    
-    // Prepare data
-    const labels = data.map(item => item.year.toString());
-    const supplyData = data.map(item => item.supply);
-    const changeData = data.map(item => item.change);
-    
-    // Create background colors based on change value
-    const backgroundColors = changeData.map(change => 
-        change >= 0 ? 'rgba(39, 117, 202, 0.7)' : 'rgba(239, 68, 68, 0.7)'
-    );
-    
-    // Create chart
-    if (yearlyChart) {
-        yearlyChart.destroy();
+    if (window.yearlyChart) {
+        window.yearlyChart.destroy();
     }
-    
-    yearlyChart = new Chart(ctx, {
+
+    const chartData = data.slice(-4); // Show last 4 years
+
+    const ctx = document.getElementById('yearlySupplyChart').getContext('2d');
+    window.yearlyChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: labels,
+            labels: chartData.map(d => d.year),
             datasets: [{
-                label: 'USDC 年度供應量（億美元） | USDC Annual Supply (Hundred Million USD)',
-                data: supplyData.map(value => value / 100), // Convert to hundreds of millions
-                backgroundColor: backgroundColors,
-                borderColor: backgroundColors.map(color => color.replace('0.7', '1')),
+                label: 'End of Year Supply (in Billions)',
+                data: chartData.map(d => (d.supply / 1000).toFixed(1)),
+                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1,
                 borderRadius: 4
             }]
