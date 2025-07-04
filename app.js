@@ -10,9 +10,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Global variables
-let monthlyChart;
-let yearlyChart;
-let chainChart;
+let monthlyChart = null;
+let yearlyChart = null;
+let chainChart = null;
 let isInitialLoad = true; // Track if this is the first load
 
 // Chart colors
