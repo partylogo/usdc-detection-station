@@ -65,7 +65,8 @@ async function fetchChainDistribution() {
             throw new Error(`DefiLlama API failed: ${response.statusText}`);
         }
         const data = await response.json();
-        const usdcData = data.peggedAssets.find(asset => asset.id === "1");
+        // Find by symbol for robustness, as ID might change.
+        const usdcData = data.peggedAssets.find(asset => asset.symbol === "USDC");
 
         if (!usdcData || !usdcData.chainCirculating) {
             throw new Error('USDC data not found in DefiLlama response');
