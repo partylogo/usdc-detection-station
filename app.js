@@ -907,7 +907,7 @@ function createMonthlyChart(data) {
 
     const chartData = data.slice(-16); // Show last 16 months
 
-    const ctx = document.getElementById('monthlySupplyChart').getContext('2d');
+    const ctx = document.getElementById('monthlyChart').getContext('2d');
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
     
     // Prepare data
@@ -1071,7 +1071,7 @@ function createYearlyChart(data) {
 
     const chartData = data.slice(-4); // Show last 4 years
 
-    const ctx = document.getElementById('yearlySupplyChart').getContext('2d');
+    const ctx = document.getElementById('yearlyChart').getContext('2d');
     window.yearlyChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -1139,12 +1139,16 @@ function createYearlyChart(data) {
 
 // Create the chain distribution chart
 function createChainChart(data) {
+    if (window.chainChart) {
+        window.chainChart.destroy();
+    }
     const ctx = document.getElementById('chainChart').getContext('2d');
     
-    // Prepare data
-    const labels = data.map(item => item.chain);
-    const supplyData = data.map(item => item.amount);
-    const backgroundColors = data.map(item => chainColors[item.chain] || chartColors[Math.floor(Math.random() * chartColors.length)]);
+    const chartData = data.slice(0, 8); // Display top 8 chains
+
+    const labels = chartData.map(item => item.chain);
+    const supplyData = chartData.map(item => item.amount);
+    const backgroundColors = chartData.map(item => chainColors[item.chain] || chartColors[Math.floor(Math.random() * chartColors.length)]);
     
     // Create chart
     if (chainChart) {
