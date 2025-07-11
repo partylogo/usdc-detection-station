@@ -1,227 +1,267 @@
 const fetch = require('node-fetch');
-const fs = require('fs');
+const fs = require('fs').promises; // Use the promise-based version of fs
 const path = require('path');
+const argv = require('minimist')(process.argv.slice(2));
+const csv = require('csv-parser');
+const { format } = require('fast-csv');
 
-const APP_JS_PATH = path.join(__dirname, 'app.js');
-const MONTHLY_CSV_PATH = path.join(__dirname, 'usdc_monthly_supply.csv');
-const YEARLY_CSV_PATH = path.join(__dirname, 'usdc_yearly_supply.csv');
-const CHAIN_CSV_PATH = path.join(__dirname, 'usdc_chain_distribution.csv');
-
-// --- API Fetching Functions ---
-
-async function fetchMonthlyHistory() {
-    console.log('Fetching 1-year historical data from CoinGecko...');
-    try {
-        const url = 'https://api.coingecko.com/api/v3/coins/usd-coin/market_chart?vs_currency=usd&days=365&interval=daily';
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`CoinGecko API failed: ${response.statusText}`);
-        }
-        const data = await response.json();
-        
-        // Process data to get one entry per month (last day of the month)
-        const monthlyData = {};
-        data.market_caps.forEach(([timestamp, marketCap]) => {
-            const date = new Date(timestamp);
-            const year = date.getUTCFullYear();
-            const month = date.getUTCMonth(); // 0-11
-            // Always store the latest entry for that month
-            monthlyData[`${year}-${month}`] = {
-                date: `${year}-${String(month + 1).padStart(2, '0')}`,
-                supply: Math.round(marketCap / 1000000), // in millions
-                year,
-                month: month + 1
-            };
-        });
-
-        // Add last available day of the current month
-         if(data.market_caps.length > 0){
-            const lastEntry = data.market_caps[data.market_caps.length - 1];
-            const lastDate = new Date(lastEntry[0]);
-            const year = lastDate.getUTCFullYear();
-            const month = lastDate.getUTCMonth();
-            monthlyData[`${year}-${month}`] = {
-                date: `${year}-${String(month + 1).padStart(2, '0')}`,
-                supply: Math.round(lastEntry[1] / 1000000),
-                year,
-                month: month + 1
-            };
-        }
-
-        console.log('Successfully processed monthly historical data.');
-        return Object.values(monthlyData);
-    } catch (error) {
-        console.error('Failed to fetch or process monthly history:', error);
-        return null;
+// --- Configuration ---
+const COINS = {
+    usdc: {
+        coingeckoId: 'usd-coin',
+        llamaSymbol: 'USDC',
+        monthlyHistoryFile: path.join(__dirname, 'usdc_monthly_supply.csv'),
+        yearlyHistoryFile: path.join(__dirname, 'usdc_yearly_supply.csv')
+    },
+    usdt: {
+        coingeckoId: 'tether',
+        llamaSymbol: 'USDT',
+        monthlyHistoryFile: path.join(__dirname, 'usdt_monthly_supply.csv'),
+        yearlyHistoryFile: path.join(__dirname, 'usdt_yearly_supply.csv')
     }
-}
+};
+const DATA_JSON_PATH = path.join(__dirname, 'data.json');
 
 
-async function fetchChainDistribution() {
-    console.log('Fetching chain distribution from DefiLlama...');
-    try {
-        const response = await fetch('https://stablecoins.llama.fi/stablecoins');
-        if (!response.ok) {
-            throw new Error(`DefiLlama API failed: ${response.statusText}`);
+// --- Data Fetching & Processing Functions ---
+
+async function readCsv(filePath) {
+    return new Promise((resolve, reject) => {
+        const results = [];
+        // The 'fs' module for sync checks should be the original one, not the promises version.
+        if (!require('fs').existsSync(filePath) || require('fs').statSync(filePath).size === 0) {
+            console.log(`History file not found or empty, starting fresh: ${filePath}`);
+            return resolve(results);
         }
-        const data = await response.json();
-        // Find by symbol for robustness, as ID might change.
-        const usdcData = data.peggedAssets.find(asset => asset.symbol === "USDC");
-
-        if (!usdcData || !usdcData.chainCirculating) {
-            throw new Error('USDC data not found in DefiLlama response');
-        }
-
-        const chainData = usdcData.chainCirculating;
-        const transformedChains = [];
-        let totalChainSupply = 0;
-
-        for (const chainName in chainData) {
-            totalChainSupply += chainData[chainName]?.current?.peggedUSD || 0;
-        }
-
-        if (totalChainSupply === 0) throw new Error("Total supply from DefiLlama is zero.");
-
-        let othersAmount = 0;
-        let othersCount = 0;
-        
-        const sortedChains = Object.entries(chainData).sort(([,a],[,b]) => (b.current?.peggedUSD || 0) - (a.current?.peggedUSD || 0));
-
-        sortedChains.forEach(([chainName, chain], index) => {
-            const amount = chain.current?.peggedUSD || 0;
-            if (amount > 0) {
-                 const amountInMillions = amount / 1000000;
-                if (index >= 8 || (amount / totalChainSupply) < 0.005) {
-                    othersAmount += amountInMillions;
-                    othersCount++;
-                } else {
-                    transformedChains.push({
-                        chain: chainName,
-                        amount: Math.round(amountInMillions),
-                        percentage: parseFloat(((amount / totalChainSupply) * 100).toFixed(1))
-                    });
+        console.log(`Reading history from ${filePath}...`);
+        require('fs').createReadStream(filePath)
+            .pipe(csv())
+            .on('data', (data) => {
+                // Enforce numeric types for specific columns right after parsing.
+                const typedData = {};
+                for (const key in data) {
+                    if (key === 'supply' || key === 'change' || key === 'year') {
+                        typedData[key] = Number(data[key]);
+                    } else {
+                        typedData[key] = data[key];
+                    }
                 }
-            }
-        });
-
-        if (othersCount > 0) {
-            transformedChains.push({
-                chain: `Others (${othersCount})`,
-                amount: Math.round(othersAmount),
-                percentage: parseFloat(((othersAmount*1000000 / totalChainSupply) * 100).toFixed(1))
-            });
-        }
-        
-        console.log('Successfully processed chain distribution data.');
-        return transformedChains;
-
-    } catch (error) {
-        console.error('Failed to fetch or process chain distribution:', error);
-        return null;
-    }
+                results.push(typedData);
+            })
+            .on('end', () => {
+                console.log(`Successfully read ${results.length} records from ${filePath}.`);
+                resolve(results);
+            })
+            .on('error', (error) => reject(error));
+    });
 }
 
-// --- Data Processing and File Writing ---
+async function writeCsv(filePath, data, headers) {
+    return new Promise((resolve, reject) => {
+        const csvStream = format({ headers });
+        const fileStream = require('fs').createWriteStream(filePath);
 
-function calculateYearlySummary(monthlyData) {
-    const yearlySummary = {};
-    monthlyData.forEach(item => {
-        if (!yearlySummary[item.year]) {
-            yearlySummary[item.year] = { year: item.year, lastSupply: 0 };
-        }
-        if (item.month === 12) {
-             yearlySummary[item.year].lastSupply = item.supply;
-        }
+        fileStream.on('finish', () => {
+            console.log(`Successfully wrote ${data.length} records to ${filePath}`);
+            resolve();
+        });
+        fileStream.on('error', reject);
+
+        csvStream.pipe(fileStream);
+        data.forEach(row => csvStream.write(row));
+        csvStream.end();
     });
-
-     // For current year, use the latest available month's supply
-    const currentYear = new Date().getFullYear();
-    if(yearlySummary[currentYear]){
-        const latestMonthForCurrentYear = monthlyData.filter(d => d.year === currentYear).sort((a,b) => b.month - a.month)[0];
-        if(latestMonthForCurrentYear){
-             yearlySummary[currentYear].lastSupply = latestMonthForCurrentYear.supply;
-        }
-    }
+}
 
 
-    const result = Object.values(yearlySummary).map((data, index, arr) => {
-        const prevYearSupply = index > 0 ? arr[index - 1].lastSupply : data.lastSupply;
-        return {
-            year: data.year,
-            supply: data.lastSupply,
-            change: data.lastSupply - prevYearSupply,
+async function fetchMonthlyHistory(coinId) {
+    console.log(`Fetching 365-day historical data for ${coinId} from CoinGecko...`);
+    // We only fetch 365 days, as we merge this with our persistent history.
+    const url = `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=365&interval=daily`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`CoinGecko API failed for ${coinId}: ${response.statusText}`);
+    
+    const data = await response.json();
+    const monthlyData = {};
+    data.market_caps.forEach(([timestamp, marketCap]) => {
+        const date = new Date(timestamp);
+        const year = date.getUTCFullYear();
+        const month = date.getUTCMonth(); // 0-11
+        const key = `${year}-${String(month + 1).padStart(2, '0')}`;
+        
+        // We take the last value for each month, as daily data can be noisy.
+        monthlyData[key] = {
+            month: key, // Use 'YYYY-MM' format as the unique key
+            supply: Math.round(marketCap / 1000000), // in millions
+            change: 0 // Will be calculated later
         };
     });
-    console.log('Successfully calculated yearly summary.');
-    return result;
+    
+    console.log(`Successfully processed CoinGecko data for ${coinId}.`);
+    return Object.values(monthlyData);
 }
 
-function toCsv(data, headers) {
-    const headerRow = headers.join(',');
-    const rows = data.map(row => headers.map(header => row[header]).join(','));
-    return [headerRow, ...rows].join('\n');
+function mergeMonthlyHistory(historicalData, newData) {
+    const dataMap = new Map();
+    historicalData.forEach(row => dataMap.set(row.month, row));
+    newData.forEach(row => dataMap.set(row.month, row));
+    
+    const merged = Array.from(dataMap.values());
+    merged.sort((a, b) => a.month.localeCompare(b.month));
+
+    // Recalculate 'change' percentage across the full, sorted dataset
+    for (let i = 1; i < merged.length; i++) {
+        const prevSupply = Number(merged[i - 1].supply);
+        const currSupply = Number(merged[i].supply);
+        if (prevSupply > 0) {
+            const changePercent = ((currSupply - prevSupply) / prevSupply) * 100;
+            merged[i].change = Math.round(changePercent);
+        } else {
+            merged[i].change = 0;
+        }
+    }
+
+    console.log('Successfully merged and recalculated monthly history.');
+    return merged;
 }
 
-async function updateStaticFiles(monthly, yearly, chains) {
-    console.log('Starting to update static files...');
-
-    // 1. Update CSV files
-    fs.writeFileSync(MONTHLY_CSV_PATH, toCsv(monthly, ['date', 'supply', 'year', 'month']), 'utf-8');
-    console.log(`Updated ${MONTHLY_CSV_PATH}`);
+async function fetchChainDistribution(symbol) {
+    console.log(`Fetching chain distribution for ${symbol} from DefiLlama...`);
+    const response = await fetch('https://stablecoins.llama.fi/stablecoins');
+    if (!response.ok) throw new Error(`DefiLlama API failed: ${response.statusText}`);
     
-    fs.writeFileSync(YEARLY_CSV_PATH, toCsv(yearly, ['year', 'supply', 'change']), 'utf-8');
-    console.log(`Updated ${YEARLY_CSV_PATH}`);
+    const data = await response.json();
+    const coinData = data.peggedAssets.find(asset => asset.symbol === symbol);
+    if (!coinData || !coinData.chainCirculating) throw new Error(`${symbol} data not found in DefiLlama response`);
 
-    fs.writeFileSync(CHAIN_CSV_PATH, toCsv(chains, ['chain', 'amount', 'percentage']), 'utf-8');
-    console.log(`Updated ${CHAIN_CSV_PATH}`);
+    const chainData = coinData.chainCirculating;
+    const transformedChains = [];
+    let totalChainSupply = Object.values(chainData).reduce((sum, chain) => sum + (chain.current?.peggedUSD || 0), 0);
+    if (totalChainSupply === 0) throw new Error(`Total supply for ${symbol} from DefiLlama is zero.`);
+
+    let othersAmount = 0;
+    let othersCount = 0;
+    const sortedChains = Object.entries(chainData).sort(([,a],[,b]) => (b.current?.peggedUSD || 0) - (a.current?.peggedUSD || 0));
+
+    sortedChains.forEach(([chainName, chain]) => {
+        const amount = chain.current?.peggedUSD || 0;
+        if (amount > 0) {
+            const amountInMillions = amount / 1000000;
+            if (transformedChains.length >= 8 || (amount / totalChainSupply) < 0.005) {
+                othersAmount += amountInMillions;
+                othersCount++;
+            } else {
+                transformedChains.push({
+                    chain: chainName,
+                    amount: Math.round(amountInMillions),
+                    percentage: parseFloat(((amount / totalChainSupply) * 100).toFixed(1))
+                });
+            }
+        }
+    });
+
+    if (othersCount > 0) {
+        transformedChains.push({
+            chain: `Others (${othersCount})`,
+            amount: Math.round(othersAmount),
+            percentage: parseFloat(((othersAmount * 1000000 / totalChainSupply) * 100).toFixed(1))
+        });
+    }
     
-    // 2. Update app.js
-    let appJsContent = fs.readFileSync(APP_JS_PATH, 'utf-8');
+    console.log(`Successfully processed chain distribution data for ${symbol}.`);
+    return transformedChains;
+}
 
-    const monthlyString = JSON.stringify(monthly, null, 4);
-    appJsContent = appJsContent.replace(/monthly: \[\s*([\s\S]*?)\s*\],/m, `monthly: ${monthlyString},`);
-
-    const yearlyString = JSON.stringify(yearly, null, 4);
-    appJsContent = appJsContent.replace(/yearly: \[\s*([\s\S]*?)\s*\],/m, `yearly: ${yearlyString},`);
-
-    const chainsString = JSON.stringify(chains, null, 4);
-    appJsContent = appJsContent.replace(/chains: \[\s*([\s\S]*?)\s*\]/m, `chains: ${chainsString}`);
+async function updateDataJson(coinKey, data) {
+    console.log(`Updating ${DATA_JSON_PATH} for ${coinKey}...`);
+    let existingData = {};
+    try {
+        const fileContent = await fs.readFile(DATA_JSON_PATH, 'utf-8');
+        existingData = JSON.parse(fileContent);
+    } catch (error) {
+        if (error.code !== 'ENOENT') { // ENOENT means file doesn't exist, which is fine.
+            console.warn('Could not read or parse existing data.json, will create a new one.', error);
+        }
+    }
     
-    // Update the current supply as well
-    const latestSupply = monthly[monthly.length-1].supply;
-    appJsContent = appJsContent.replace(/(current: \{\s*total_supply: )\d+,/m, `$1${latestSupply},`);
-    appJsContent = appJsContent.replace(/(market_cap: )\d+,/m, `$1${latestSupply},`);
-    appJsContent = appJsContent.replace(/(fdv: )\d+,/m, `$1${latestSupply},`);
-    
-    const lastUpdatedDate = new Date().toISOString().split('T')[0];
-    appJsContent = appJsContent.replace(/(last_updated: )".*?",/m, `$1"${lastUpdatedDate}",`);
-
-
-    fs.writeFileSync(APP_JS_PATH, appJsContent, 'utf-8');
-    console.log(`Updated ${APP_JS_PATH}`);
-
-    console.log('All static files updated successfully!');
+    existingData[coinKey] = data;
+    await fs.writeFile(DATA_JSON_PATH, JSON.stringify(existingData, null, 2), 'utf-8');
+    console.log(`Successfully updated ${DATA_JSON_PATH}.`);
 }
 
 
 // --- Main Execution ---
 
 async function main() {
-    console.log('--- Running USDC Data Updater ---');
-    
-    const monthlyData = await fetchMonthlyHistory();
-    const chainData = await fetchChainDistribution();
-
-    if (!monthlyData || !chainData) {
-        console.error('Failed to fetch required data. Aborting update.');
+    const coin = argv.coin;
+    if (!coin || !COINS[coin]) {
+        console.error('ERROR: Please specify a valid coin with --coin=usdc or --coin=usdt');
         process.exit(1);
     }
     
-    const yearlyData = calculateYearlySummary(monthlyData);
-    
-    await updateStaticFiles(monthlyData, yearlyData, chainData);
-    
-    console.log('--- Update Complete ---');
+    console.log(`\n--- Running Data Updater for ${coin.toUpperCase()} ---`);
+    const coinConfig = COINS[coin];
+
+    try {
+        // 1. Handle historical monthly data
+        const monthlyHistoricalData = await readCsv(coinConfig.monthlyHistoryFile);
+        const newMonthlyData = await fetchMonthlyHistory(coinConfig.coingeckoId);
+        const fullMonthlyHistory = mergeMonthlyHistory(monthlyHistoricalData, newMonthlyData);
+        await writeCsv(coinConfig.monthlyHistoryFile, fullMonthlyHistory, ['month', 'supply', 'change']);
+
+        // 2. Read and dynamically update yearly data
+        const yearlyData = await readCsv(coinConfig.yearlyHistoryFile);
+        
+        // --- Logic to update current year's supply ---
+        if (fullMonthlyHistory.length > 0) {
+            const latestMonthlyRecord = fullMonthlyHistory[fullMonthlyHistory.length - 1];
+            const currentYear = new Date(latestMonthlyRecord.month).getFullYear();
+            let currentYearRecord = yearlyData.find(d => d.year === currentYear);
+
+            // If the current year doesn't exist in the yearly data, create it.
+            if (!currentYearRecord) {
+                currentYearRecord = { year: currentYear, supply: 0, change: 0 };
+                yearlyData.push(currentYearRecord);
+                yearlyData.sort((a, b) => a.year - b.year); // Keep it sorted
+                console.log(`Added new record for year ${currentYear}.`);
+            }
+
+            // Update the supply for the current year
+            currentYearRecord.supply = latestMonthlyRecord.supply;
+            
+            // Recalculate change percentage for the current year
+            const previousYearRecord = yearlyData.find(d => d.year === currentYear - 1);
+            if (previousYearRecord) {
+                const prevSupply = Number(previousYearRecord.supply);
+                if (prevSupply > 0) {
+                    const changePercent = ((currentYearRecord.supply - prevSupply) / prevSupply) * 100;
+                    currentYearRecord.change = Math.round(changePercent);
+                }
+            }
+            
+            // Persist the potentially updated yearly data back to its CSV
+            await writeCsv(coinConfig.yearlyHistoryFile, yearlyData, ['year', 'supply', 'change']);
+            console.log(`Dynamically updated and persisted yearly data for ${currentYear}.`);
+        }
+        
+        // 3. Fetch latest chain distribution
+        const chainData = await fetchChainDistribution(coinConfig.llamaSymbol);
+
+        // 4. Consolidate and write to data.json
+        const finalData = {
+            monthly: fullMonthlyHistory,
+            yearly: yearlyData, // Use the dynamically updated yearly data
+            chains: chainData,
+            last_updated: new Date().toISOString()
+        };
+        await updateDataJson(coin, finalData);
+
+        console.log(`--- Update Complete for ${coin.toUpperCase()} ---`);
+
+    } catch (error) {
+        console.error(`\nFATAL ERROR during update for ${coin.toUpperCase()}:`, error.message);
+        process.exit(1);
+    }
 }
 
 main(); 

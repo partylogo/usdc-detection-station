@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEMO - USDC/USDT 檢測站</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="demo.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="title-section">
+                        <h1>USDC/USDT 檢測站</h1>
+                        <p class="subtitle">USDC/USDT Detection Station</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="timestamp">
+                        <span class="timestamp-label">最後更新 | Last Updated:</span>
+                        <span class="timestamp-value" id="lastUpdated">2025-06-24 12:56 PM</span>
+                    </div>
+                    <button class="btn btn--primary update-btn" id="updateBtn">
+                        <span class="update-text">更新數據</span>
+                        <span class="update-text-en">Update Data</span>
+                    </button>
+                </div>
+            </div>
+            <div class="header-tabs">
+                <div class="tab-item active" data-tab="usdc">USDC</div>
+                <div class="tab-item" data-tab="usdt">USDT</div>
+            </div>
+        </header>
+
+        <div id="usdc-content" class="tab-pane active">
+            <!-- Main Dashboard -->
+            <main class="dashboard">
+                <!-- Current Supply Section -->
+                <section class="supply-overview">
+                    <div class="card supply-card">
+                        <div class="card__body">
+                            <div class="supply-header">
+                                <h2>目前 USDC 總發行量</h2>
+                                <p class="supply-subtitle">Current USDC Total Supply</p>
+                            </div>
+                            <div class="supply-main">
+                                <div class="supply-amount">
+                                    <span class="currency-symbol">$</span>
+                                    <span class="amount-value" id="totalSupply">61,690</span>
+                                    <span class="amount-unit">億 | Hundred Million</span>
+                                </div>
+                                <div class="supply-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">最近一季增長 | Latest Quarter Growth</span>
+                                        <span class="stat-value positive" id="quarterlyGrowthValue">+$11.7億 (+1.9%)</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">近 12 月平均月增長 | Avg 12M Growth</span>
+                                        <span class="stat-value" id="avg12MonthGrowth">+1.2%</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">近 3 月平均月增長 | Avg 3M Growth</span>
+                                        <span class="stat-value" id="avg3MonthGrowth">+0.4%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Charts Section -->
+                <section class="charts-section">
+                    <div class="charts-grid">
+                        <!-- Monthly Chart -->
+                        <div class="card chart-card">
+                            <div class="card__body">
+                                <div class="chart-header">
+                                    <h3>每月供應量趨勢</h3>
+                                    <p class="chart-subtitle">Monthly Supply Trend with Analytics</p>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="usdcMonthlyChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Yearly Chart -->
+                        <div class="card chart-card">
+                            <div class="card__body">
+                                <div class="chart-header">
+                                    <h3>每年供應量趨勢</h3>
+                                    <p class="chart-subtitle">Yearly Supply Trend</p>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="usdcYearlyChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Chain Distribution Section -->
+                <section class="distribution-section">
+                    <div class="distribution-grid">
+                        <!-- Chart -->
+                        <div class="card distribution-chart-card">
+                            <div class="card__body">
+                                <div class="chart-header">
+                                    <h3>USDC 在不同鏈的分布</h3>
+                                    <p class="chart-subtitle">USDC Distribution Across Chains</p>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="usdcChainChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chain Stats Table -->
+                        <div class="card chain-stats-card">
+                            <div class="card__body">
+                                <div class="chart-header">
+                                    <h3>鏈分布統計</h3>
+                                    <p class="chart-subtitle">Chain Distribution Statistics</p>
+                                </div>
+                                <div class="chain-stats-table" id="usdcChainStatsTable">
+                                    <!-- Will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <div id="usdt-content" class="tab-pane">
+            <!-- Main Dashboard -->
+            <main class="dashboard">
+                <!-- Current Supply Section -->
+                <section class="supply-overview">
+                    <div class="card supply-card">
+                        <div class="card__body">
+                            <div class="supply-header">
+                                <h2>目前 USDT 總發行量</h2>
+                                <p class="supply-subtitle">Current USDT Total Supply</p>
+                            </div>
+                            <div class="supply-main">
+                                <div class="supply-amount">
+                                    <span class="currency-symbol">$</span>
+                                    <span class="amount-value">112,345</span>
+                                    <span class="amount-unit">億 | Hundred Million</span>
+                                </div>
+                                <div class="supply-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">最近一季增長 | Latest Quarter Growth</span>
+                                        <span class="stat-value positive">+$20.1億 (+2.3%)</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">近 12 月平均月增長 | Avg 12M Growth</span>
+                                        <span class="stat-value">+2.1%</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">近 3 月平均月增長 | Avg 3M Growth</span>
+                                        <span class="stat-value">+1.8%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Charts Section -->
+                <section class="charts-section">
+                    <div class="charts-grid">
+                        <!-- Monthly Chart -->
+                        <div class="card chart-card">
+                            <div class="card__body">
+                                <div class="chart-header">
+                                    <h3>每月供應量趨勢</h3>
+                                    <p class="chart-subtitle">Monthly Supply Trend with Analytics</p>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="usdtMonthlyChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Yearly Chart -->
+                        <div class="card chart-card">
+                            <div class="card__body">
+                                <div class="chart-header">
+                                    <h3>每年供應量趨勢</h3>
+                                    <p class="chart-subtitle">Yearly Supply Trend</p>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="usdtYearlyChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Chain Distribution Section -->
+                <section class="distribution-section">
+                    <div class="distribution-grid">
+                        <!-- Chart -->
+                        <div class="card distribution-chart-card">
+                            <div class="card__body">
+                                <div class="chart-header">
+                                    <h3>USDT 在不同鏈的分布</h3>
+                                    <p class="chart-subtitle">USDT Distribution Across Chains</p>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="usdtChainChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chain Stats Table -->
+                        <div class="card chain-stats-card">
+                            <div class="card__body">
+                                <div class="chart-header">
+                                    <h3>鏈分布統計</h3>
+                                    <p class="chart-subtitle">Chain Distribution Statistics</p>
+                                </div>
+                                <div class="chain-stats-table" id="usdtChainStatsTable">
+                                    <!-- Will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p class="footer-text">
+                    數據來源 | Data Sources: Circle, Tether, Etherscan, Various Chain Explorers
+                </p>
+                <p class="footer-timestamp">
+                    系統時間 | System Time: <span id="systemTime"></span>
+                </p>
+            </div>
+        </footer>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">
+                <p>更新數據中...</p>
+                <p>Updating Data...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="demo.js"></script>
+</body>
+</html> 

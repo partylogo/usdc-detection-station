@@ -1,0 +1,445 @@
+{
+  "usdc": {
+    "monthly": [
+      {
+        "month": "2023-01",
+        "supply": 45000,
+        "change": 0
+      },
+      {
+        "month": "2023-02",
+        "supply": 43000,
+        "change": -4
+      },
+      {
+        "month": "2023-03",
+        "supply": 41000,
+        "change": -5
+      },
+      {
+        "month": "2023-04",
+        "supply": 33000,
+        "change": -20
+      },
+      {
+        "month": "2023-05",
+        "supply": 30000,
+        "change": -9
+      },
+      {
+        "month": "2023-06",
+        "supply": 29000,
+        "change": -3
+      },
+      {
+        "month": "2023-07",
+        "supply": 28000,
+        "change": -3
+      },
+      {
+        "month": "2023-08",
+        "supply": 26000,
+        "change": -7
+      },
+      {
+        "month": "2023-09",
+        "supply": 26000,
+        "change": 0
+      },
+      {
+        "month": "2023-10",
+        "supply": 25000,
+        "change": -4
+      },
+      {
+        "month": "2023-11",
+        "supply": 24000,
+        "change": -4
+      },
+      {
+        "month": "2023-12",
+        "supply": 24000,
+        "change": 0
+      },
+      {
+        "month": "2024-01",
+        "supply": 25000,
+        "change": 4
+      },
+      {
+        "month": "2024-02",
+        "supply": 26000,
+        "change": 4
+      },
+      {
+        "month": "2024-03",
+        "supply": 28000,
+        "change": 8
+      },
+      {
+        "month": "2024-04",
+        "supply": 32000,
+        "change": 14
+      },
+      {
+        "month": "2024-07",
+        "supply": 33471,
+        "change": 5
+      },
+      {
+        "month": "2024-08",
+        "supply": 34748,
+        "change": 4
+      },
+      {
+        "month": "2024-09",
+        "supply": 36242,
+        "change": 4
+      },
+      {
+        "month": "2024-10",
+        "supply": 35044,
+        "change": -3
+      },
+      {
+        "month": "2024-11",
+        "supply": 39807,
+        "change": 14
+      },
+      {
+        "month": "2024-12",
+        "supply": 43803,
+        "change": 10
+      },
+      {
+        "month": "2025-01",
+        "supply": 53108,
+        "change": 21
+      },
+      {
+        "month": "2025-02",
+        "supply": 55583,
+        "change": 5
+      },
+      {
+        "month": "2025-03",
+        "supply": 60188,
+        "change": 8
+      },
+      {
+        "month": "2025-04",
+        "supply": 62143,
+        "change": 3
+      },
+      {
+        "month": "2025-05",
+        "supply": 61040,
+        "change": -2
+      },
+      {
+        "month": "2025-06",
+        "supply": 61672,
+        "change": 1
+      },
+      {
+        "month": "2025-07",
+        "supply": 62820,
+        "change": 2
+      }
+    ],
+    "yearly": [
+      {
+        "year": 2021,
+        "supply": 4000,
+        "change": 0
+      },
+      {
+        "year": 2022,
+        "supply": 42000,
+        "change": 950
+      },
+      {
+        "year": 2023,
+        "supply": 45000,
+        "change": 7
+      },
+      {
+        "year": 2024,
+        "supply": 25000,
+        "change": -44
+      },
+      {
+        "year": 2025,
+        "supply": 62820,
+        "change": 151
+      }
+    ],
+    "chains": [
+      {
+        "chain": "Ethereum",
+        "amount": 38414,
+        "percentage": 61.4
+      },
+      {
+        "chain": "Solana",
+        "amount": 7854,
+        "percentage": 12.6
+      },
+      {
+        "chain": "Hyperliquid L1",
+        "amount": 4029,
+        "percentage": 6.4
+      },
+      {
+        "chain": "Base",
+        "amount": 3726,
+        "percentage": 6
+      },
+      {
+        "chain": "Arbitrum",
+        "amount": 1819,
+        "percentage": 2.9
+      },
+      {
+        "chain": "Polygon",
+        "amount": 1038,
+        "percentage": 1.7
+      },
+      {
+        "chain": "BSC",
+        "amount": 990,
+        "percentage": 1.6
+      },
+      {
+        "chain": "Sui",
+        "amount": 842,
+        "percentage": 1.3
+      },
+      {
+        "chain": "Others (104)",
+        "amount": 3852,
+        "percentage": 6.2
+      }
+    ],
+    "last_updated": "2025-07-11T11:20:49.243Z"
+  },
+  "usdt": {
+    "monthly": [
+      {
+        "month": "2023-01",
+        "supply": 66000,
+        "change": 0
+      },
+      {
+        "month": "2023-02",
+        "supply": 68000,
+        "change": 3
+      },
+      {
+        "month": "2023-03",
+        "supply": 70000,
+        "change": 3
+      },
+      {
+        "month": "2023-04",
+        "supply": 79000,
+        "change": 13
+      },
+      {
+        "month": "2023-05",
+        "supply": 82000,
+        "change": 4
+      },
+      {
+        "month": "2023-06",
+        "supply": 83000,
+        "change": 1
+      },
+      {
+        "month": "2023-07",
+        "supply": 83000,
+        "change": 0
+      },
+      {
+        "month": "2023-08",
+        "supply": 83000,
+        "change": 0
+      },
+      {
+        "month": "2023-09",
+        "supply": 83000,
+        "change": 0
+      },
+      {
+        "month": "2023-10",
+        "supply": 84000,
+        "change": 1
+      },
+      {
+        "month": "2023-11",
+        "supply": 87000,
+        "change": 4
+      },
+      {
+        "month": "2023-12",
+        "supply": 91000,
+        "change": 5
+      },
+      {
+        "month": "2024-01",
+        "supply": 92000,
+        "change": 1
+      },
+      {
+        "month": "2024-02",
+        "supply": 95000,
+        "change": 3
+      },
+      {
+        "month": "2024-03",
+        "supply": 100000,
+        "change": 5
+      },
+      {
+        "month": "2024-04",
+        "supply": 105000,
+        "change": 5
+      },
+      {
+        "month": "2024-07",
+        "supply": 114430,
+        "change": 9
+      },
+      {
+        "month": "2024-08",
+        "supply": 118222,
+        "change": 3
+      },
+      {
+        "month": "2024-09",
+        "supply": 119509,
+        "change": 1
+      },
+      {
+        "month": "2024-10",
+        "supply": 120381,
+        "change": 1
+      },
+      {
+        "month": "2024-11",
+        "supply": 133559,
+        "change": 11
+      },
+      {
+        "month": "2024-12",
+        "supply": 138763,
+        "change": 4
+      },
+      {
+        "month": "2025-01",
+        "supply": 139418,
+        "change": 0
+      },
+      {
+        "month": "2025-02",
+        "supply": 142168,
+        "change": 2
+      },
+      {
+        "month": "2025-03",
+        "supply": 144152,
+        "change": 1
+      },
+      {
+        "month": "2025-04",
+        "supply": 148006,
+        "change": 3
+      },
+      {
+        "month": "2025-05",
+        "supply": 153119,
+        "change": 3
+      },
+      {
+        "month": "2025-06",
+        "supply": 157596,
+        "change": 3
+      },
+      {
+        "month": "2025-07",
+        "supply": 159124,
+        "change": 1
+      }
+    ],
+    "yearly": [
+      {
+        "year": 2021,
+        "supply": 21000,
+        "change": 0
+      },
+      {
+        "year": 2022,
+        "supply": 78000,
+        "change": 271
+      },
+      {
+        "year": 2023,
+        "supply": 66000,
+        "change": -15
+      },
+      {
+        "year": 2024,
+        "supply": 92000,
+        "change": 39
+      },
+      {
+        "year": 2025,
+        "supply": 159124,
+        "change": 73
+      }
+    ],
+    "chains": [
+      {
+        "chain": "Tron",
+        "amount": 80586,
+        "percentage": 50.4
+      },
+      {
+        "chain": "Ethereum",
+        "amount": 64370,
+        "percentage": 40.2
+      },
+      {
+        "chain": "BSC",
+        "amount": 6282,
+        "percentage": 3.9
+      },
+      {
+        "chain": "Solana",
+        "amount": 2318,
+        "percentage": 1.4
+      },
+      {
+        "chain": "Polygon",
+        "amount": 1071,
+        "percentage": 0.7
+      },
+      {
+        "chain": "Aptos",
+        "amount": 990,
+        "percentage": 0.6
+      },
+      {
+        "chain": "Arbitrum",
+        "amount": 919,
+        "percentage": 0.6
+      },
+      {
+        "chain": "Others (84)",
+        "amount": 3457,
+        "percentage": 2.2
+      }
+    ],
+    "last_updated": "2025-07-11T11:20:49.969Z"
+  }
+}

@@ -1,9 +1,9 @@
-name: Update USDC Static Data
+name: Update Static Data
 
 on:
   schedule:
-    # Runs at 02:00 UTC every Sunday
-    - cron: '0 2 * * 0'
+    # Runs at 02:00 UTC every day
+    - cron: '0 2 * * *'
   workflow_dispatch: # Allows manual triggering from the GitHub Actions tab
 
 jobs:
@@ -24,7 +24,7 @@ jobs:
         run: npm install
 
       - name: Run data update script
-        run: node update-data.js
+        run: npm run update:all
 
       - name: Commit and push if there are changes
         run: |
