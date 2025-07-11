@@ -846,10 +846,8 @@ function updateSystemTime() {
 function updateDashboardData(data) {
     // Convert from millions to hundreds of millions (億)
     const totalSupplyInHundredMillion = (data.current.total_supply / 100).toFixed(1);
-    const marketCapInHundredMillion = (data.current.market_cap / 100).toFixed(1);
     
     document.getElementById('totalSupply').textContent = totalSupplyInHundredMillion;
-    document.getElementById('marketCap').textContent = `$${marketCapInHundredMillion}億`;
     document.getElementById('lastUpdated').textContent = formatTimestamp(new Date(data.current.last_updated));
     
     // Update quarterly summary
@@ -861,19 +859,17 @@ function updateQuarterlySummary(data) {
     const quarterlyGrowthValue = document.querySelector('.supply-stats .stat-item:first-child .stat-value');
 
     if (quarterlyGrowthLabel && quarterlyGrowthValue) {
+        // Format the label
+        quarterlyGrowthLabel.innerHTML = `最近一季增長 | Latest Quarter Growth`;
+
+        // Always calculate growth based on previous quarter's data for consistency
         const now = new Date();
         const year = now.getFullYear();
         const quarter = Math.floor(now.getMonth() / 3) + 1;
 
-        // Format the label
-        quarterlyGrowthLabel.innerHTML = `Q${quarter} ${year} 增長 | Q${quarter} ${year} Growth`;
-
-        // Always calculate growth based on previous quarter's data for consistency
-        const previousQuarterEndMonth = quarter * 3 - 3;
-        
         // Find supply at the end of the previous quarter
         const previousData = data.monthly
-            .filter(d => d.year < year || (d.year === year && d.month <= previousQuarterEndMonth))
+            .filter(d => d.year < year || (d.year === year && d.month <= quarter * 3 - 3))
             .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
 
         let growthAmount = 0;
@@ -901,8 +897,8 @@ function updateQuarterlySummary(data) {
 
 // Create the monthly supply chart with advanced features
 function createMonthlyChart(data) {
-    if (window.monthlyChart) {
-        window.monthlyChart.destroy();
+    if (monthlyChart) {
+        monthlyChart.destroy();
     }
 
     const chartData = data.slice(-16); // Show last 16 months
@@ -1065,14 +1061,14 @@ function createMonthlyChart(data) {
 
 // Create the yearly supply chart
 function createYearlyChart(data) {
-    if (window.yearlyChart) {
-        window.yearlyChart.destroy();
+    if (yearlyChart) {
+        yearlyChart.destroy();
     }
 
     const chartData = data.slice(-4); // Show last 4 years
 
     const ctx = document.getElementById('yearlyChart').getContext('2d');
-    window.yearlyChart = new Chart(ctx, {
+    yearlyChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: chartData.map(d => d.year),
@@ -1139,8 +1135,8 @@ function createYearlyChart(data) {
 
 // Create the chain distribution chart
 function createChainChart(data) {
-    if (window.chainChart) {
-        window.chainChart.destroy();
+    if (chainChart) {
+        chainChart.destroy();
     }
     const ctx = document.getElementById('chainChart').getContext('2d');
     
@@ -1436,12 +1432,10 @@ function updateGrowthMetrics(data) {
     
     // Update DOM elements
     updateMetricValue('avg12MonthGrowth', 
-        (avg12MonthGrowth >= 0 ? '+' : '') + avg12MonthGrowth.toFixed(1) + '%', 
-        avg12MonthGrowth >= 0 ? 'positive' : 'negative');
+        (avg12MonthGrowth >= 0 ? '+' : '') + avg12MonthGrowth.toFixed(1) + '%');
     
     updateMetricValue('avg3MonthGrowth', 
-        (avg3MonthGrowth >= 0 ? '+' : '') + avg3MonthGrowth.toFixed(1) + '%', 
-        avg3MonthGrowth >= 0 ? 'positive' : 'negative');
+        (avg3MonthGrowth >= 0 ? '+' : '') + avg3MonthGrowth.toFixed(1) + '%');
 }
 
 // Helper function to update metric values
@@ -1449,7 +1443,7 @@ function updateMetricValue(elementId, value, className = '') {
     const element = document.getElementById(elementId);
     if (element) {
         element.textContent = value;
-        element.className = 'metric-value' + (className ? ' ' + className : '');
+        element.className = 'stat-value' + (className ? ' ' + className : '');
     }
 }
 
