@@ -725,6 +725,10 @@ select.form-control {
   border-radius: var(--radius-base);
 }
 
+.title-section {
+  text-align: center;
+}
+
 .title-section h1 {
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
