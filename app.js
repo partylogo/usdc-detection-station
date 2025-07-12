@@ -59,7 +59,7 @@ function render(coin) {
     // Update metrics
     elements.lastUpdated.textContent = new Date(coinData.last_updated).toLocaleDateString();
     elements.currentCoinTitle.textContent = `目前 ${coinName} 總發行量`;
-    elements.currentCoinSubtitle.textContent = `Current ${coinName} Total Supply`;
+    elements.currentCoinSubtitle.textContent = ``;
     
     const latestMonthly = coinData.monthly[coinData.monthly.length - 1];
     elements.totalSupply.textContent = (latestMonthly.supply / 100).toFixed(1);
@@ -85,7 +85,7 @@ function render(coin) {
 
     // Update table
     elements.chainDistTitle.textContent = `${coinName} 在不同鏈的分布`;
-    elements.chainDistSubtitle.textContent = `${coinName} Distribution Across Chains`;
+    elements.chainDistSubtitle.textContent = ``;
     updateChainTable(coinData.chains);
 }
 
@@ -122,14 +122,14 @@ function createMonthlyChart(data, coinName) {
             labels: chartData.map(d => d.month), // Changed from d.date to d.month
             datasets: [{
                 type: 'line',
-                label: `${coinName} Supply (Billions)`,
-                data: chartData.map(d => d.supply / 1000),
+                label: `${coinName} 供應量（億）`,
+                data: chartData.map(d => d.supply / 100),
                 yAxisID: 'y-supply',
                 borderColor: 'rgba(54, 162, 235, 1)',
                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
             }, {
                     type: 'bar',
-                label: 'Monthly Growth %',
+                label: '月增長 %',
                 data: growthData,
                 yAxisID: 'y-growth',
                 backgroundColor: growthBarColors,
@@ -140,13 +140,13 @@ function createMonthlyChart(data, coinName) {
             scales: {
                 'y-supply': {
                     position: 'left',
-                    title: { display: true, text: 'Supply (Billions)' },
-                    ticks: { callback: value => `$${value}B` }
+                    title: { display: true, text: '供應量（億）' },
+                    ticks: { callback: value => `$${value}` }
                 },
                 'y-growth': {
                     position: 'right',
                     grid: { drawOnChartArea: false },
-                    title: { display: true, text: 'Growth (%)' },
+                    title: { display: true, text: '增長（%）' },
                     ticks: { callback: value => `${value.toFixed(1)}%` }
                 }
             }
@@ -162,14 +162,14 @@ function createYearlyChart(data, coinName) {
         data: {
             labels: data.map(d => d.year),
             datasets: [{
-                label: `E.O.Y. Supply (Billions)`,
-                data: data.map(d => d.supply / 1000),
+                label: `年終供應量（億）`,
+                data: data.map(d => d.supply / 100),
                 backgroundColor: 'rgba(75, 192, 192, 0.6)',
             }]
         },
         options: {
             responsive: true, maintainAspectRatio: false,
-            scales: { y: { ticks: { callback: value => `$${value}B` } } }
+            scales: { y: { ticks: { callback: value => `$${value}` } } }
         }
     });
 }
@@ -211,7 +211,7 @@ function updateChainTable(data) {
         // Cell 2: Supply
         const amountCell = row.insertCell();
         amountCell.className = 'align-right';
-        amountCell.textContent = `$${(chain.amount / 1000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}B`;
+        amountCell.textContent = `$${(chain.amount / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
         // Cell 3: Share
         const shareCell = row.insertCell();

@@ -963,6 +963,16 @@ select.form-control {
   margin-bottom: var(--space-8);
 }
 
+.card-header {
+  text-align: center;
+  margin-bottom: var(--space-20);
+}
+
+.card-header h3 {
+  color: var(--color-text);
+  margin-bottom: var(--space-8);
+}
+
 .chart-subtitle {
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
@@ -977,6 +987,7 @@ select.form-control {
 }
 
 .table-container {
+    margin-top: var(--space-24);
     padding: var(--space-12);
 }
 
@@ -1098,29 +1109,34 @@ select.form-control {
 /* Footer */
 .footer {
   margin-top: var(--space-32);
-  padding: var(--space-24) 0;
+  padding: var(--space-16) 0;
   border-top: 1px solid var(--color-border);
   background: var(--color-surface);
 }
 
 .footer-content {
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
   align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-16);
+  justify-content: space-between;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-32);
 }
 
 .footer-text {
+  margin: 0;
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
-  margin: 0;
+  padding: var(--space-4);
+  text-align: left;
 }
 
 .footer-timestamp {
+  margin: 0;
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
-  margin: 0;
+  padding: var(--space-4);
+  text-align: right;
 }
 
 /* Loading Overlay */
@@ -1212,6 +1228,11 @@ select.form-control {
   
   .footer-content {
     flex-direction: column;
+    text-align: center;
+    padding: var(--space-16);
+  }
+  
+  .footer-text, .footer-timestamp {
     text-align: center;
   }
 }

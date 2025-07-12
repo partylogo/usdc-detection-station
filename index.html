@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>穩定幣檢測站 | Stablecoin Detection Station</title>
+    <title>穩定幣檢測站</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -15,12 +15,12 @@
                 <div class="logo-section">
                     <div class="title-section">
                         <h1>穩定幣檢測站</h1>
-                        <p class="subtitle">Stablecoin Detection Station</p>
+                        <!-- <p class="subtitle">Stablecoin Detection Station</p> -->
                     </div>
                 </div>
                 <div class="header-actions">
                     <div class="timestamp">
-                        <span class="timestamp-label">最後更新 | Last Updated:</span>
+                        <span class="timestamp-label">最後更新</span>
                         <span class="timestamp-value" id="last-updated"></span>
                     </div>
                 </div>
@@ -46,19 +46,19 @@
                             <div class="supply-amount">
                                 <span class="currency-symbol">$</span>
                                 <span class="amount-value" id="total-supply"></span>
-                                <span class="amount-unit">億 | Hundred Million</span>
+                                <span class="amount-unit">億</span>
                             </div>
                             <div class="supply-stats">
                                 <div class="stat-item">
-                                    <span class="stat-label">最近一季增長 | Latest Quarter Growth</span>
+                                    <span class="stat-label">最近一季增長</span>
                                     <span class="stat-value" id="quarterly-growth"></span>
                                 </div>
                                 <div class="stat-item">
-                                    <span class="stat-label">近 12 月平均月增長 | Avg 12M Growth</span>
+                                    <span class="stat-label">近 12 月平均月增長</span>
                                     <span class="stat-value" id="12m-growth"></span>
                                 </div>
                                 <div class="stat-item">
-                                    <span class="stat-label">近 3 月平均月增長 | Avg 3M Growth</span>
+                                    <span class="stat-label">近 3 月平均月增長</span>
                                     <span class="stat-value" id="3m-growth"></span>
                                 </div>
                             </div>
@@ -74,7 +74,6 @@
                         <div class="card__body">
                             <div class="chart-header">
                                 <h3>每月供應量趨勢</h3>
-                                <p class="chart-subtitle">Monthly Supply Trend with Analytics</p>
                             </div>
                             <div class="chart-container">
                                 <canvas id="monthly-chart"></canvas>
@@ -85,7 +84,6 @@
                         <div class="card__body">
                             <div class="card-header">
                                 <h3>每年供應量趨勢</h3>
-                                <p>Yearly Supply Trend</p>
                             </div>
                             <div class="chart-container">
                                 <canvas id="yearly-chart"></canvas>
@@ -103,7 +101,6 @@
                         <div class="card__body">
                             <div class="card-header">
                                 <h3>鏈分布統計</h3>
-                                <p>Chain Distribution Stats</p>
                             </div>
                             <div class="chart-container">
                                 <canvas id="chain-chart"></canvas>
@@ -123,9 +120,9 @@
                                     <table id="chain-table">
                                         <thead>
                                             <tr>
-                                                <th>Chain</th>
-                                                <th>Supply (B)</th>
-                                                <th>Share</th>
+                                                <th>鏈</th>
+                                                <th>供應量</th>
+                                                <th>佔比</th>
                                             </tr>
                                         </thead>
                                         <tbody id="chain-table-body">
@@ -143,12 +140,8 @@
         <!-- Footer -->
         <footer class="footer">
             <div class="footer-content">
-                <p class="footer-text">
-                    數據來源 | Data Sources: Circle, Tether, CoinGecko, DefiLlama
-                </p>
-                <p class="footer-timestamp">
-                    系統時間 | System Time: <span id="systemTime"></span>
-                </p>
+                <p class="footer-text">數據來源: CoinGecko, DefiLlama</p>
+                <p class="footer-timestamp">系統時間: <span id="systemTime"></span></p>
             </div>
         </footer>
     </div>
