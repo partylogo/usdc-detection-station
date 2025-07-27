@@ -143,7 +143,7 @@
       },
       {
         "month": "2025-07",
-        "supply": 64254,
+        "supply": 64291,
         "change": 4
       }
     ],
@@ -170,39 +170,39 @@
       },
       {
         "year": 2025,
-        "supply": 64254,
+        "supply": 64291,
         "change": 157
       }
     ],
     "chains": [
       {
         "chain": "Ethereum",
-        "amount": 38519,
-        "percentage": 60.1
+        "amount": 38408,
+        "percentage": 60
       },
       {
         "chain": "Solana",
-        "amount": 8330,
+        "amount": 8307,
         "percentage": 13
       },
       {
         "chain": "Hyperliquid L1",
-        "amount": 4871,
+        "amount": 4888,
         "percentage": 7.6
       },
       {
         "chain": "Base",
-        "amount": 3687,
+        "amount": 3710,
         "percentage": 5.8
       },
       {
         "chain": "Arbitrum",
-        "amount": 1951,
-        "percentage": 3
+        "amount": 1968,
+        "percentage": 3.1
       },
       {
         "chain": "Polygon",
-        "amount": 1070,
+        "amount": 1069,
         "percentage": 1.7
       },
       {
@@ -217,11 +217,11 @@
       },
       {
         "chain": "Others (104)",
-        "amount": 3762,
+        "amount": 3766,
         "percentage": 5.9
       }
     ],
-    "last_updated": "2025-07-26T03:27:20.995Z"
+    "last_updated": "2025-07-27T03:48:07.813Z"
   },
   "usdt": {
     "monthly": [
@@ -367,8 +367,8 @@
       },
       {
         "month": "2025-07",
-        "supply": 163065,
-        "change": 3
+        "supply": 163617,
+        "change": 4
       }
     ],
     "yearly": [
@@ -394,20 +394,20 @@
       },
       {
         "year": 2025,
-        "supply": 163065,
-        "change": 77
+        "supply": 163617,
+        "change": 78
       }
     ],
     "chains": [
       {
         "chain": "Tron",
-        "amount": 80947,
+        "amount": 81151,
         "percentage": 49.4
       },
       {
         "chain": "Ethereum",
-        "amount": 67272,
-        "percentage": 41
+        "amount": 67519,
+        "percentage": 41.1
       },
       {
         "chain": "BSC",
@@ -426,20 +426,20 @@
       },
       {
         "chain": "Arbitrum",
-        "amount": 1001,
+        "amount": 1019,
         "percentage": 0.6
       },
       {
         "chain": "Aptos",
-        "amount": 959,
+        "amount": 1009,
         "percentage": 0.6
       },
       {
         "chain": "Others (84)",
-        "amount": 3384,
+        "amount": 3395,
         "percentage": 2.1
       }
     ],
-    "last_updated": "2025-07-26T03:27:21.566Z"
+    "last_updated": "2025-07-27T03:48:08.229Z"
   }
 }
