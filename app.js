@@ -243,13 +243,22 @@ async function init() {
         // Setup tab listeners
         document.querySelector('.header-tabs').addEventListener('click', (e) => {
             const tab = e.target.closest('.tab');
-            if (tab && tab.dataset.coin !== state.activeCoin) {
-                state.activeCoin = tab.dataset.coin;
-                // Update active class
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                // Re-render with new coin
-                render(state.activeCoin);
+            if (tab) {
+                // Handle external link tabs
+                if (tab.dataset.action === 'external' && tab.dataset.url) {
+                    window.open(tab.dataset.url, '_blank');
+                    return;
+                }
+                
+                // Handle coin tabs
+                if (tab.dataset.coin && tab.dataset.coin !== state.activeCoin) {
+                    state.activeCoin = tab.dataset.coin;
+                    // Update active class
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    // Re-render with new coin
+                    render(state.activeCoin);
+                }
             }
         });
 

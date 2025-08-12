@@ -1,6 +1,22 @@
-# 穩定幣檢測站 (Stablecoin Detection Station)
+# 穩定幣檢測站
 
-這是一個輕量級的穩定幣數據監控儀表板，旨在提供關鍵穩定幣（如 USDC, USDT）的供應量、歷史趨勢和鏈上分布的視覺化分析。專案採用了自動化的數據更新機制，並透過一個可擴展的前端架構來呈現數據。
+這是一個輕量級的穩定幣數據監控儀表板，專門提供關鍵穩定幣（如 USDC, USDT）的供應量、歷史趨勢和鏈上分布的視覺化分析。專案採用了自動化的數據更新機制，並透過一個可擴展的前端架構來呈現數據。
+
+## 最新更新
+
+### 2024年12月 - 介面中文化
+- ✅ **完全中文化**：移除所有英文標題和標籤，統一使用中文介面
+- ✅ **單位統一**：所有圖表單位從「十億」改為「億」，更符合中文習慣
+- ✅ **佈局優化**：調整標題與圖表間距，確保視覺一致性
+- ✅ **Footer 改進**：優化頁腳佈局，數據來源靠左，系統時間靠右
+- ✅ **響應式設計**：在手機版保持良好的顯示效果
+
+### 主要功能特色
+- 📊 **實時數據**：每日自動更新 USDC/USDT 供應量數據
+- 📈 **趨勢分析**：提供月度和年度供應量趨勢圖表
+- 🔗 **鏈分布**：顯示穩定幣在不同區塊鏈上的分布情況
+- 📱 **響應式設計**：支援桌面和移動設備
+- 🔄 **自動更新**：透過 GitHub Actions 每日自動更新數據
 
 ## 程式架構總覽
 
@@ -47,7 +63,7 @@
 前端是一個純粹的靜態網站，不依賴任何複雜的框架（如 React, Vue）。
 
 - **`index.html`**: 提供了一個通用的 UI 模板，所有的穩定幣都共用這一套 HTML 結構。
-- **`style.css`**: 專案的所有樣式。
+- **`style.css`**: 專案的所有樣式，包含響應式設計和深色模式支援。
 - **`app.js`**: 前端的核心邏輯。
     - **渲染引擎**: 包含一個核心的 `render(coin)` 函式。當用戶切換 Tab (如 USDC/USDT) 時，此函式會被觸發。
     - **數據驅動**: 它會從 `data.json` 中讀取對應幣種的數據，然後動態地將這些數據填充到 `index.html` 的 UI 模板中，並使用 Chart.js 來繪製圖表。
@@ -65,6 +81,42 @@
     3. **自動提交**: 腳本執行完畢後，如果 `data.json` 或任何 `.csv` 檔案有變更，Action 會自動將這些變更 `commit` 並 `push` 回 `main` 分支。
 
 ---
+
+## 快速開始
+
+### 本地開發
+
+1. **克隆專案**
+   ```bash
+   git clone <repository-url>
+   cd usdc-detection-station
+   ```
+
+2. **安裝依賴**
+   ```bash
+   npm install
+   ```
+
+3. **更新數據**
+   ```bash
+   npm run update:all
+   ```
+
+4. **啟動本地伺服器**
+   ```bash
+   python3 -m http.server 8000
+   ```
+
+5. **訪問網站**
+   打開瀏覽器訪問 `http://localhost:8000`
+
+### 部署
+
+專案可以部署到任何支援靜態網站的平台，如：
+- GitHub Pages
+- Netlify
+- Vercel
+- 或任何 Web 伺服器
 
 ## 如何新增一個穩定幣 (例如：DAI)
 
@@ -146,11 +198,34 @@ node update-data.js --coin=dai
 
 ### Step 5: 本地測試與提交
 
-1.  執行 `npm start` 啟動本地伺服器。
-2.  打開 `http://localhost:8080`，切換到 DAI 的 Tab，確認所有圖表和數據都顯示正常。
+1.  執行 `python3 -m http.server 8000` 啟動本地伺服器。
+2.  打開 `http://localhost:8000`，切換到 DAI 的 Tab，確認所有圖表和數據都顯示正常。
 3.  確認無誤後，將所有變更和新檔案 (`update-data.js`, `index.html`, `dai_monthly_supply.csv`, `dai_yearly_supply.csv`) commit 並 push 到 GitHub。
 
 ### 額外需要注意的坑
 
 - **坑4 (GitHub Action 同步衝突)**: 如果你 push 程式碼後，發現自動更新的 Action 執行失敗，且錯誤是 `non-fast-forward`，這代表在你 push 的同時，Action 也被觸發了。**解決方法**: 等你 push 完成後，去 "Actions" 分頁手動 "Re-run" 一次失敗的 workflow 即可。
 - **坑5 (瀏覽器快取)**: 如果你確定後端數據已更新，但前端畫面還是舊的，請嘗試**強制重新整理 (Cmd+Shift+R 或 Ctrl+Shift+R)**，這通常是瀏覽器快取導致的。
+
+## 技術規格
+
+- **前端**: HTML5, CSS3, Vanilla JavaScript
+- **圖表**: Chart.js
+- **數據處理**: Node.js
+- **API**: CoinGecko API, DefiLlama API
+- **自動化**: GitHub Actions
+- **部署**: 靜態網站託管
+
+## 貢獻指南
+
+歡迎提交 Issue 和 Pull Request！
+
+1. Fork 此專案
+2. 建立功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交變更 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 開啟 Pull Request
+
+## 授權
+
+此專案採用 MIT 授權 - 詳見 [LICENSE](LICENSE) 檔案
