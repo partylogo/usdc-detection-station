@@ -24,6 +24,9 @@ jobs:
         run: npm install
 
       - name: Run data update script
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_PAGE_ID: ${{ secrets.NOTION_PAGE_ID }}
         run: npm run update:all
 
       - name: Commit and push if there are changes

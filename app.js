@@ -10,7 +10,9 @@
 // --- Application State ---
 const state = {
     activeCoin: 'usdc', // Default active coin
+    activePage: 'guide', // 'coin' or 'guide' - default to guide
     data: {},           // Cache for all fetched coin data
+    guideData: null,    // Cache for guide content
     charts: {           // Cache for chart instances to allow proper destruction
         monthly: null,
         yearly: null,
@@ -228,17 +230,74 @@ function getChainColor(chainName, allChains) {
     return chainColors[index % chainColors.length];
 }
 
+// --- Guide Page Rendering ---
+function renderGuide() {
+    if (!state.guideData) {
+        console.error('Guide data not loaded');
+        return;
+    }
+    
+    // Clear existing charts
+    Object.keys(state.charts).forEach(key => {
+        if (state.charts[key]) {
+            state.charts[key].destroy();
+            state.charts[key] = null;
+        }
+    });
+    
+    // Render guide content
+    const dashboard = document.querySelector('.dashboard');
+    dashboard.innerHTML = `
+        <section class="guide-section">
+            <div class="card guide-card">
+                <div class="card__body">
+                    <div class="guide-content">
+                        ${state.guideData.content}
+                    </div>
+                </div>
+            </div>
+        </section>
+    `;
+    
+    // Update last updated timestamp
+    if (elements.lastUpdated) {
+        elements.lastUpdated.textContent = new Date(state.guideData.last_updated).toLocaleDateString();
+    }
+}
+
 
 // --- Initialization ---
 
 async function init() {
     try {
+        // Load coin data
         const response = await fetch('data.json');
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         state.data = await response.json();
         
-        // Initial render
-        render(state.activeCoin);
+        // Load guide data
+        try {
+            const guideResponse = await fetch('guide.json');
+            if (guideResponse.ok) {
+                state.guideData = await guideResponse.json();
+            }
+        } catch (err) {
+            console.warn('Could not load guide data:', err);
+        }
+        
+        // Store original dashboard HTML for restoration
+        const originalDashboard = document.querySelector('.dashboard').innerHTML;
+        
+        // Initial render - show guide by default
+        if (state.activePage === 'guide' && state.guideData) {
+            renderGuide();
+        } else if (state.activePage === 'coin') {
+            render(state.activeCoin);
+        } else {
+            // Fallback to USDC if guide fails
+            state.activePage = 'coin';
+            render(state.activeCoin);
+        }
 
         // Setup tab listeners
         document.querySelector('.header-tabs').addEventListener('click', (e) => {
@@ -250,14 +309,51 @@ async function init() {
                     return;
                 }
                 
+                // Handle guide tab
+                if (tab.dataset.page === 'guide') {
+                    if (state.activePage !== 'guide') {
+                        state.activePage = 'guide';
+                        // Update active class
+                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        // Render guide
+                        renderGuide();
+                    }
+                    return;
+                }
+                
                 // Handle coin tabs
-                if (tab.dataset.coin && tab.dataset.coin !== state.activeCoin) {
-                    state.activeCoin = tab.dataset.coin;
-                    // Update active class
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    // Re-render with new coin
-                    render(state.activeCoin);
+                if (tab.dataset.coin) {
+                    // If we're coming from guide, restore dashboard structure
+                    if (state.activePage === 'guide') {
+                        state.activePage = 'coin';
+                        document.querySelector('.dashboard').innerHTML = originalDashboard;
+                        // Re-cache DOM elements after restoration
+                        elements.lastUpdated = document.getElementById('last-updated');
+                        elements.currentCoinTitle = document.getElementById('current-coin-title');
+                        elements.currentCoinSubtitle = document.getElementById('current-coin-subtitle');
+                        elements.totalSupply = document.getElementById('total-supply');
+                        elements.quarterlyGrowth = document.getElementById('quarterly-growth');
+                        elements.avg12mGrowth = document.getElementById('12m-growth');
+                        elements.avg3mGrowth = document.getElementById('3m-growth');
+                        elements.monthlyChartCanvas = document.getElementById('monthly-chart');
+                        elements.yearlyChartCanvas = document.getElementById('yearly-chart');
+                        elements.chainDistTitle = document.getElementById('chain-dist-title');
+                        elements.chainDistSubtitle = document.getElementById('chain-dist-subtitle');
+                        elements.chainChartCanvas = document.getElementById('chain-chart');
+                        elements.chainTableBody = document.getElementById('chain-table-body');
+                        elements.systemTime = document.getElementById('systemTime');
+                    }
+                    
+                    if (tab.dataset.coin !== state.activeCoin || state.activePage === 'coin') {
+                        state.activeCoin = tab.dataset.coin;
+                        state.activePage = 'coin';
+                        // Update active class
+                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        // Re-render with new coin
+                        render(state.activeCoin);
+                    }
                 }
             }
         });

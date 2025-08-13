@@ -12,8 +12,9 @@ npm start              # Start local HTTP server using http-server
 ### Data Management
 ```bash
 npm run update:usdc    # Update USDC data from APIs
-npm run update:usdt    # Update USDT data from APIs  
-npm run update:all     # Update all coin data (USDC + USDT)
+npm run update:usdt    # Update USDT data from APIs
+npm run update:guide   # Update guide content from Notion (or use default)
+npm run update:all     # Update all data (USDC + USDT + Guide)
 ```
 
 ### Local Development Setup
@@ -57,12 +58,19 @@ External APIs → Node.js Script → CSV Storage → JSON Cache → Frontend Ren
 
 **3. Frontend Application**
 - **Single-page application** using vanilla JavaScript (no framework)
-- `index.html` - Unified template for all stablecoins
-- `app.js` - Data-driven rendering engine with coin switching logic
+- `index.html` - Unified template for all stablecoins and guide page
+- `app.js` - Data-driven rendering engine with coin switching and guide page logic
 - `style.css` - Complete styling with responsive design
 - Uses Chart.js for data visualization
 
-**4. Automation (`.github/workflows/update-data.yml`)**
+**4. Guide Content Management (`update-guide.js`)**
+- Fetches content from Notion API (optional, uses environment variables)
+- Converts Notion blocks to HTML format
+- Falls back to default content if Notion is not configured
+- Outputs content to `guide.json` for frontend consumption
+- Supports rich formatting: headings, lists, code blocks, callouts, etc.
+
+**5. Automation (`.github/workflows/update-data.yml`)**
 - Runs daily at 02:00 UTC via GitHub Actions
 - Executes `npm run update:all`
 - Auto-commits data changes back to repository
@@ -116,6 +124,23 @@ npm start                         # Test in browser
 - **Responsive Design**: Mobile-first CSS with desktop optimizations
 - **Chinese Localization**: UI fully localized to Traditional Chinese
 - **No Build Process**: Pure static files, no compilation required
+- **Notion Integration**: Optional CMS integration for guide content management
+
+## Notion Setup (Optional)
+
+The guide page can be managed through Notion. See `NOTION_SETUP.md` for detailed instructions.
+
+### Environment Variables
+```bash
+NOTION_TOKEN=secret_xxxxx...     # Notion Integration Token
+NOTION_PAGE_ID=xxxxxx...         # Notion Page ID (32 characters)
+```
+
+### Local Development
+Create `.env` file with Notion credentials, or leave unset to use default content.
+
+### GitHub Actions
+Set `NOTION_TOKEN` and `NOTION_PAGE_ID` as repository secrets for automatic updates.
 
 ## Advanced Features
 

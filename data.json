@@ -148,8 +148,8 @@
       },
       {
         "month": "2025-08",
-        "supply": 65601.15,
-        "change": 2
+        "supply": 66467.73,
+        "change": 4
       }
     ],
     "yearly": [
@@ -175,8 +175,8 @@
       },
       {
         "year": 2025,
-        "supply": 65601.15,
-        "change": 50
+        "supply": 66467.73,
+        "change": 52
       }
     ],
     "chains": [
@@ -226,7 +226,7 @@
         "percentage": 5.6
       }
     ],
-    "last_updated": "2025-08-13T00:53:53.742Z"
+    "last_updated": "2025-08-13T01:09:00.517Z"
   },
   "usdt": {
     "monthly": [
@@ -322,62 +322,62 @@
       },
       {
         "month": "2024-09",
-        "supply": 119509,
+        "supply": 119508.8,
         "change": 1
       },
       {
         "month": "2024-10",
-        "supply": 120381,
+        "supply": 120380.63,
         "change": 1
       },
       {
         "month": "2024-11",
-        "supply": 133559,
+        "supply": 133558.62,
         "change": 11
       },
       {
         "month": "2024-12",
-        "supply": 138763,
+        "supply": 138763.09,
         "change": 4
       },
       {
         "month": "2025-01",
-        "supply": 139418,
+        "supply": 139418.12,
         "change": 0
       },
       {
         "month": "2025-02",
-        "supply": 142168,
+        "supply": 142167.94,
         "change": 2
       },
       {
         "month": "2025-03",
-        "supply": 144152,
+        "supply": 144151.84,
         "change": 1
       },
       {
         "month": "2025-04",
-        "supply": 148006,
+        "supply": 148006.01,
         "change": 3
       },
       {
         "month": "2025-05",
-        "supply": 153119,
+        "supply": 153119.22,
         "change": 3
       },
       {
         "month": "2025-06",
-        "supply": 157596,
+        "supply": 157596.2,
         "change": 3
       },
       {
         "month": "2025-07",
-        "supply": 163743,
+        "supply": 163743.26,
         "change": 4
       },
       {
         "month": "2025-08",
-        "supply": 164621,
+        "supply": 164991.74,
         "change": 1
       }
     ],
@@ -394,18 +394,18 @@
       },
       {
         "year": 2023,
-        "supply": 66000,
-        "change": -15
+        "supply": 91000,
+        "change": 17
       },
       {
         "year": 2024,
-        "supply": 92000,
-        "change": 39
+        "supply": 138763.09,
+        "change": 52
       },
       {
         "year": 2025,
-        "supply": 164621,
-        "change": 79
+        "supply": 164991.74,
+        "change": 19
       }
     ],
     "chains": [
@@ -416,7 +416,7 @@
       },
       {
         "chain": "Ethereum",
-        "amount": 67834,
+        "amount": 67822,
         "percentage": 41.2
       },
       {
@@ -426,30 +426,30 @@
       },
       {
         "chain": "Solana",
-        "amount": 2023,
+        "amount": 2053,
         "percentage": 1.2
       },
       {
         "chain": "Polygon",
-        "amount": 1227,
-        "percentage": 0.7
+        "amount": 1237,
+        "percentage": 0.8
       },
       {
         "chain": "Arbitrum",
-        "amount": 1149,
+        "amount": 1155,
         "percentage": 0.7
       },
       {
         "chain": "Aptos",
-        "amount": 886,
+        "amount": 887,
         "percentage": 0.5
       },
       {
         "chain": "Others (85)",
-        "amount": 3099,
+        "amount": 3096,
         "percentage": 1.9
       }
     ],
-    "last_updated": "2025-08-12T03:18:10.240Z"
+    "last_updated": "2025-08-13T01:09:01.483Z"
   }
 }

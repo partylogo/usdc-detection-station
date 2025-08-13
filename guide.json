@@ -1,0 +1,6 @@
+{
+  "title": "使用說明",
+  "content": "<h2>歡迎使用穩定幣趨勢觀察站</h2>\n<p>這是一個追蹤主要穩定幣供應量和鏈分布的數據平台。</p>\n\n<h3>功能介紹</h3>\n<ul>\n<li><strong>USDC Tab</strong>：查看 USDC 的供應量趨勢和鏈分布</li>\n<li><strong>USDT Tab</strong>：查看 USDT 的供應量趨勢和鏈分布</li>\n<li><strong>CPP Tab</strong>：連結至 Commerce Payments Protocol 數據面板</li>\n</ul>\n\n<h3>數據說明</h3>\n<ul>\n<li><strong>總發行量</strong>：顯示當前穩定幣的總供應量（單位：億美元）</li>\n<li><strong>增長率</strong>：包含最近一季、近12個月和近3個月的平均月增長率</li>\n<li><strong>月度趨勢圖</strong>：展示每月供應量變化和增長率</li>\n<li><strong>年度趨勢圖</strong>：展示年度供應量變化趨勢</li>\n<li><strong>鏈分布</strong>：顯示穩定幣在不同區塊鏈上的分布情況</li>\n</ul>\n\n<h3>數據來源</h3>\n<p>本站數據來自以下可靠來源：</p>\n<ul>\n<li><strong>CoinGecko</strong>：提供歷史市值數據作為供應量代理</li>\n<li><strong>DefiLlama</strong>：提供鏈分布數據</li>\n</ul>\n\n<h3>更新頻率</h3>\n<p>數據每日自動更新（UTC 02:00），確保您看到的是最新資訊。</p>\n\n<div class=\"callout\">\n<span class=\"callout-icon\">💡</span>\n<div class=\"callout-content\">提示：點擊不同的 Tab 可以切換查看不同穩定幣的數據。所有圖表都支援互動操作。</div>\n</div>",
+  "last_updated": "2025-08-13T01:23:17.551Z",
+  "source": "default"
+}

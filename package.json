@@ -7,7 +7,8 @@
     "start": "http-server -c-1",
     "update:usdc": "node update-data.js --coin=usdc",
     "update:usdt": "node update-data.js --coin=usdt",
-    "update:all": "npm run update:usdc && npm run update:usdt",
+    "update:guide": "node update-guide.js",
+    "update:all": "npm run update:usdc && npm run update:usdt && npm run update:guide",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,6 +23,7 @@
   },
   "homepage": "https://github.com/partylogo/usdc-detection-station#readme",
   "dependencies": {
+    "@notionhq/client": "^2.2.15",
     "csv-parser": "^3.2.0",
     "fast-csv": "^5.0.2",
     "minimist": "^1.2.8",
