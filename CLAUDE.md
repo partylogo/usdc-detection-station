@@ -44,6 +44,10 @@ External APIs → Node.js Script → CSV Storage → JSON Cache → Frontend Ren
 - Fetches chain distribution from DefiLlama API
 - Merges new data with persistent CSV history to maintain long-term records
 - Automatically calculates monthly/yearly growth percentages
+- **Enhanced Error Handling**: Structured error classification (APIError, DataError) with intelligent retry logic
+- **Performance Monitoring**: Real-time tracking of operation performance and memory usage
+- **Data Validation**: Comprehensive data completeness checks and anomaly detection
+- **Precision Handling**: Safe rounding for large numbers to prevent precision loss
 - Outputs consolidated data to `data.json`
 
 **2. Data Persistence (`*_supply.csv` files)**
@@ -112,3 +116,18 @@ npm start                         # Test in browser
 - **Responsive Design**: Mobile-first CSS with desktop optimizations
 - **Chinese Localization**: UI fully localized to Traditional Chinese
 - **No Build Process**: Pure static files, no compilation required
+
+## Advanced Features
+
+### Error Handling & Monitoring
+- **Smart Error Classification**: Automatic categorization of network, API, validation, and file system errors
+- **Retry Strategy**: Exponential backoff with retryable/non-retryable error detection
+- **Exit Codes**: Different exit codes for various error types (API: 2/3, Data: 4, General: 1)
+- **Performance Tracking**: Detailed timing metrics for all operations with memory usage monitoring
+- **Data Quality Assurance**: Gap detection, anomaly warnings, and historical data validation
+
+### Data Processing Enhancements
+- **Precision Management**: SafeRound function prevents large number precision loss
+- **UTC Standardization**: All date/time operations use UTC timezone for consistency
+- **Completeness Validation**: Identifies missing months and validates yearly data consistency
+- **Historical Record Detection**: Automatically identifies records without corresponding monthly data
