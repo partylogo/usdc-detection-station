@@ -1379,7 +1379,7 @@ select.form-control {
 }
 
 .guide-content h2 {
-    font-size: var(--font-size-3xl);
+    font-size: var(--font-size-4xl);
     font-weight: var(--font-weight-bold);
     color: var(--color-text);
     margin: 0 0 var(--space-20) 0;
@@ -1387,7 +1387,7 @@ select.form-control {
 }
 
 .guide-content h3 {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-semibold);
     color: var(--color-text);
     margin: var(--space-24) 0 var(--space-16) 0;
@@ -1395,7 +1395,7 @@ select.form-control {
 }
 
 .guide-content h4 {
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-xl);
     font-weight: var(--font-weight-medium);
     color: var(--color-text);
     margin: var(--space-20) 0 var(--space-12) 0;
@@ -1403,7 +1403,7 @@ select.form-control {
 }
 
 .guide-content p {
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-lg);
     color: var(--color-text);
     margin: 0 0 var(--space-16) 0;
     line-height: var(--line-height-normal);
@@ -1415,7 +1415,7 @@ select.form-control {
 }
 
 .guide-content li {
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-lg);
     color: var(--color-text);
     margin-bottom: var(--space-8);
     line-height: var(--line-height-normal);
@@ -1423,7 +1423,7 @@ select.form-control {
 
 .guide-content strong {
     font-weight: var(--font-weight-semibold);
-    color: var(--color-primary);
+    color: var(--color-text);
 }
 
 .guide-content code {
@@ -1508,7 +1508,7 @@ select.form-control {
 
 .guide-content .callout-content {
     flex: 1;
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-lg);
     color: var(--color-text);
     line-height: var(--line-height-normal);
 }
