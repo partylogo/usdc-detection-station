@@ -148,8 +148,8 @@
       },
       {
         "month": "2025-08",
-        "supply": 68372.25,
-        "change": 7
+        "supply": 67821.59,
+        "change": 6
       }
     ],
     "yearly": [
@@ -175,8 +175,8 @@
       },
       {
         "year": 2025,
-        "supply": 68372.25,
-        "change": 56
+        "supply": 67821.59,
+        "change": 55
       }
     ],
     "chains": [
@@ -226,7 +226,7 @@
         "percentage": 5.2
       }
     ],
-    "last_updated": "2025-08-19T03:11:09.756Z"
+    "last_updated": "2025-08-20T03:09:13.169Z"
   },
   "usdt": {
     "monthly": [
@@ -377,7 +377,7 @@
       },
       {
         "month": "2025-08",
-        "supply": 166803.33,
+        "supply": 167001.02,
         "change": 2
       }
     ],
@@ -404,7 +404,7 @@
       },
       {
         "year": 2025,
-        "supply": 166803.33,
+        "supply": 167001.02,
         "change": 20
       }
     ],
@@ -455,6 +455,6 @@
         "percentage": 1.6
       }
     ],
-    "last_updated": "2025-08-19T03:11:10.285Z"
+    "last_updated": "2025-08-20T03:09:13.606Z"
   }
 }
