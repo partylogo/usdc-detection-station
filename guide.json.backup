@@ -1,6 +1,6 @@
 {
   "title": "穩定幣網站內容",
   "content": "<h2>歡迎使用本站</h2>\n<h4><strong>功能介紹</strong></h4>\n<ul>\n<li><strong>USDC</strong>：查看 USDC 的供應量與趨勢</li>\n<li><strong>USDT </strong>：查看 USDC 的供應量與趨勢</li>\n<li><strong>CPP </strong>：Commerce Payments Protocol 是 Shopify 和 Coinbase 合作 Crypto 支付的底層合約，透過這個 Dune 的 Dashboard 可以評估 Crypto 支付的普及狀況（現在是滿慘的）</li>\n</ul>\n<p>本站是透過 AI Coding 工具開發的，如果有發現資料有誤或哪裡有問題，再請見諒，也歡迎聯絡我</p>",
-  "last_updated": "2025-11-19T03:13:09.082Z",
+  "last_updated": "2025-11-20T03:10:58.213Z",
   "source": "notion"
 }
