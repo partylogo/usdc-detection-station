@@ -178,7 +178,7 @@
       },
       {
         "month": "2026-02",
-        "supply": 70704.67,
+        "supply": 70633.87,
         "change": 1
       }
     ],
@@ -210,39 +210,39 @@
       },
       {
         "year": 2026,
-        "supply": 70704.67,
+        "supply": 70633.87,
         "change": -7
       }
     ],
     "chains": [
       {
         "chain": "Ethereum",
-        "amount": 45775,
-        "percentage": 64.7
+        "amount": 45794,
+        "percentage": 64.8
       },
       {
         "chain": "Solana",
-        "amount": 7610,
-        "percentage": 10.8
-      },
-      {
-        "chain": "Hyperliquid L1",
-        "amount": 4266,
-        "percentage": 6
+        "amount": 7433,
+        "percentage": 10.5
       },
       {
         "chain": "Base",
-        "amount": 4154,
+        "amount": 4212,
+        "percentage": 6
+      },
+      {
+        "chain": "Hyperliquid L1",
+        "amount": 4141,
         "percentage": 5.9
       },
       {
         "chain": "Arbitrum",
-        "amount": 2175,
-        "percentage": 3.1
+        "amount": 2233,
+        "percentage": 3.2
       },
       {
         "chain": "Polygon",
-        "amount": 1465,
+        "amount": 1473,
         "percentage": 2.1
       },
       {
@@ -252,16 +252,16 @@
       },
       {
         "chain": "Avalanche",
-        "amount": 598,
-        "percentage": 0.8
+        "amount": 647,
+        "percentage": 0.9
       },
       {
-        "chain": "Others (108)",
-        "amount": 3395,
+        "chain": "Others (107)",
+        "amount": 3423,
         "percentage": 4.8
       }
     ],
-    "last_updated": "2026-02-05T04:16:35.115Z"
+    "last_updated": "2026-02-06T04:16:46.649Z"
   },
   "usdt": {
     "monthly": [
@@ -442,7 +442,7 @@
       },
       {
         "month": "2026-02",
-        "supply": 185394.51,
+        "supply": 185510.21,
         "change": 0
       }
     ],
@@ -474,30 +474,30 @@
       },
       {
         "year": 2026,
-        "supply": 185394.51,
+        "supply": 185510.21,
         "change": -1
       }
     ],
     "chains": [
       {
         "chain": "Tron",
-        "amount": 83353,
-        "percentage": 45
+        "amount": 83395,
+        "percentage": 44.9
       },
       {
         "chain": "Ethereum",
-        "amount": 82598,
+        "amount": 82816,
         "percentage": 44.6
       },
       {
         "chain": "BSC",
-        "amount": 8968,
+        "amount": 8972,
         "percentage": 4.8
       },
       {
         "chain": "Solana",
-        "amount": 2810,
-        "percentage": 1.5
+        "amount": 2662,
+        "percentage": 1.4
       },
       {
         "chain": "Plasma",
@@ -505,11 +505,16 @@
         "percentage": 0.8
       },
       {
-        "chain": "Others (92)",
-        "amount": 6156,
-        "percentage": 3.3
+        "chain": "Arbitrum",
+        "amount": 953,
+        "percentage": 0.5
+      },
+      {
+        "chain": "Others (91)",
+        "amount": 5272,
+        "percentage": 2.8
       }
     ],
-    "last_updated": "2026-02-05T04:16:35.569Z"
+    "last_updated": "2026-02-06T04:16:47.060Z"
   }
 }
