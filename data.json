@@ -203,7 +203,7 @@
       },
       {
         "month": "2026-07",
-        "supply": 73287.18,
+        "supply": 73199.25,
         "change": -1
       }
     ],
@@ -235,39 +235,39 @@
       },
       {
         "year": 2026,
-        "supply": 73287.18,
+        "supply": 73199.25,
         "change": -4
       }
     ],
     "chains": [
       {
         "chain": "Ethereum",
-        "amount": 47031,
-        "percentage": 64.1
+        "amount": 47121,
+        "percentage": 64.3
       },
       {
         "chain": "Solana",
-        "amount": 7329,
-        "percentage": 10
+        "amount": 7116,
+        "percentage": 9.7
       },
       {
         "chain": "Hyperliquid L1",
-        "amount": 5827,
+        "amount": 5830,
         "percentage": 7.9
       },
       {
         "chain": "Base",
-        "amount": 4276,
+        "amount": 4285,
         "percentage": 5.8
       },
       {
         "chain": "Arbitrum",
-        "amount": 2259,
+        "amount": 2275,
         "percentage": 3.1
       },
       {
         "chain": "Polygon",
-        "amount": 1814,
+        "amount": 1819,
         "percentage": 2.5
       },
       {
@@ -277,16 +277,16 @@
       },
       {
         "chain": "Avalanche",
-        "amount": 488,
+        "amount": 504,
         "percentage": 0.7
       },
       {
         "chain": "Others (128)",
-        "amount": 2778,
+        "amount": 2809,
         "percentage": 3.8
       }
     ],
-    "last_updated": "2026-07-08T05:22:42.376Z"
+    "last_updated": "2026-07-09T06:06:44.207Z"
   },
   "usdt": {
     "monthly": [
@@ -492,7 +492,7 @@
       },
       {
         "month": "2026-07",
-        "supply": 184216.19,
+        "supply": 184141.71,
         "change": 0
       }
     ],
@@ -524,20 +524,20 @@
       },
       {
         "year": 2026,
-        "supply": 184216.19,
+        "supply": 184141.71,
         "change": -2
       }
     ],
     "chains": [
       {
         "chain": "Tron",
-        "amount": 87492,
-        "percentage": 47.8
+        "amount": 88736,
+        "percentage": 48.2
       },
       {
         "chain": "Ethereum",
-        "amount": 77255,
-        "percentage": 42.2
+        "amount": 77283,
+        "percentage": 42
       },
       {
         "chain": "BSC",
@@ -551,15 +551,15 @@
       },
       {
         "chain": "Arbitrum",
-        "amount": 1002,
+        "amount": 952,
         "percentage": 0.5
       },
       {
         "chain": "Others (105)",
-        "amount": 5516,
+        "amount": 5439,
         "percentage": 3
       }
     ],
-    "last_updated": "2026-07-08T05:22:42.985Z"
+    "last_updated": "2026-07-09T06:06:44.652Z"
   }
 }
