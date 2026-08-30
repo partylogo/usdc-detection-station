@@ -208,7 +208,7 @@
       },
       {
         "month": "2026-08",
-        "supply": 74117.99,
+        "supply": 74025.87,
         "change": 3
       }
     ],
@@ -240,39 +240,39 @@
       },
       {
         "year": 2026,
-        "supply": 74117.99,
-        "change": -2
+        "supply": 74025.87,
+        "change": -3
       }
     ],
     "chains": [
       {
         "chain": "Ethereum",
-        "amount": 47402,
+        "amount": 47392,
         "percentage": 63.9
       },
       {
         "chain": "Solana",
-        "amount": 7054,
-        "percentage": 9.5
+        "amount": 6965,
+        "percentage": 9.4
       },
       {
         "chain": "Hyperliquid L1",
-        "amount": 6705,
-        "percentage": 9
+        "amount": 6720,
+        "percentage": 9.1
       },
       {
         "chain": "Base",
-        "amount": 4255,
-        "percentage": 5.7
+        "amount": 4271,
+        "percentage": 5.8
       },
       {
         "chain": "Arbitrum",
-        "amount": 2229,
+        "amount": 2194,
         "percentage": 3
       },
       {
         "chain": "Polygon",
-        "amount": 1758,
+        "amount": 1760,
         "percentage": 2.4
       },
       {
@@ -282,16 +282,16 @@
       },
       {
         "chain": "Avalanche",
-        "amount": 430,
+        "amount": 426,
         "percentage": 0.6
       },
       {
-        "chain": "Others (122)",
-        "amount": 2787,
+        "chain": "Others (121)",
+        "amount": 2809,
         "percentage": 3.8
       }
     ],
-    "last_updated": "2026-08-29T08:43:24.718Z"
+    "last_updated": "2026-08-30T08:00:23.467Z"
   },
   "usdt": {
     "monthly": [
@@ -502,7 +502,7 @@
       },
       {
         "month": "2026-08",
-        "supply": 183421.09,
+        "supply": 183407.02,
         "change": 0
       }
     ],
@@ -534,19 +534,19 @@
       },
       {
         "year": 2026,
-        "supply": 183421.09,
+        "supply": 183407.02,
         "change": -2
       }
     ],
     "chains": [
       {
         "chain": "Tron",
-        "amount": 91939,
+        "amount": 91932,
         "percentage": 50.1
       },
       {
         "chain": "Ethereum",
-        "amount": 73436,
+        "amount": 73358,
         "percentage": 40
       },
       {
@@ -560,11 +560,11 @@
         "percentage": 1.5
       },
       {
-        "chain": "Others (104)",
-        "amount": 5995,
+        "chain": "Others (105)",
+        "amount": 6032,
         "percentage": 3.3
       }
     ],
-    "last_updated": "2026-08-29T08:43:25.196Z"
+    "last_updated": "2026-08-30T08:00:23.882Z"
   }
 }
